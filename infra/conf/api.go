@@ -1,12 +1,14 @@
 package conf
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/xtls/xray-core/app/commander"
 	loggerservice "github.com/xtls/xray-core/app/log/command"
 	observatoryservice "github.com/xtls/xray-core/app/observatory/command"
 	handlerservice "github.com/xtls/xray-core/app/proxyman/command"
+	routingservice "github.com/xtls/xray-core/app/router/command"
 	statsservice "github.com/xtls/xray-core/app/stats/command"
 	"github.com/xtls/xray-core/common/serial"
 )
@@ -34,6 +36,9 @@ func (c *APIConfig) Build() (*commander.Config, error) {
 			services = append(services, serial.ToTypedMessage(&statsservice.Config{}))
 		case "observatoryservice":
 			services = append(services, serial.ToTypedMessage(&observatoryservice.Config{}))
+		case "routingservice":
+			fmt.Println("load routing service")
+			services = append(services, serial.ToTypedMessage(&routingservice.Config{}))
 		}
 	}
 
