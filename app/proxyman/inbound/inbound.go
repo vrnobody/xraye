@@ -4,6 +4,7 @@ package inbound
 
 import (
 	"context"
+	"slices"
 	"sync"
 
 	"github.com/xtls/xray-core/app/proxyman"
@@ -71,21 +72,39 @@ func (m *Manager) GetHandler(ctx context.Context, tag string) (inbound.Handler, 
 
 // RemoveHandler implements inbound.Manager.
 func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
-	if tag == "" {
-		return common.ErrNoClue
-	}
-
 	m.access.Lock()
 	defer m.access.Unlock()
 
-	if handler, found := m.taggedHandlers[tag]; found {
+	var handler inbound.Handler
+	switch t := proxyman.ParseTag(tag).(type) {
+	case int:
+		if t >= 0 && t < len(m.untaggedHandler) {
+			handler = m.untaggedHandler[t]
+			m.untaggedHandler = slices.Delete(m.untaggedHandler, t, t+1)
+		} else {
+			err := newError("handler #", t, ", index out of range").AtWarning()
+			err.WriteToLog(session.ExportIDToError(ctx))
+			return err
+		}
+	case string:
+		if h, found := m.taggedHandlers[t]; found {
+			handler = h
+			delete(m.taggedHandlers, t)
+		} else {
+			err := newError("handler ", t, " not found").AtWarning()
+			err.WriteToLog(session.ExportIDToError(ctx))
+			return err
+		}
+	case error:
+		return t
+	}
+
+	if handler != nil {
 		if err := handler.Close(); err != nil {
 			newError("failed to close handler ", tag).Base(err).AtWarning().WriteToLog(session.ExportIDToError(ctx))
 		}
-		delete(m.taggedHandlers, tag)
 		return nil
 	}
-
 	return common.ErrNoClue
 }
 
