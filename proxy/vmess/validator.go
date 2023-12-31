@@ -3,6 +3,8 @@ package vmess
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/json"
+
 	"hash/crc64"
 	"strings"
 	"sync"
@@ -30,6 +32,38 @@ func NewTimedUserValidator() *TimedUserValidator {
 		aeadDecoderHolder: aead.NewAuthIDDecoderHolder(),
 	}
 	return tuv
+}
+
+// GetAll users info.
+func (v *TimedUserValidator) GetAll() (string, bool) {
+	v.Lock()
+	defer v.Unlock()
+
+	type info struct {
+		Id       string
+		Security string
+		Email    string
+		Level    uint32
+	}
+
+	// i know this approach is slow, PR is welcome
+	users := make([]*info, 0)
+	for _, mu := range v.users {
+		if ma, ok := mu.Account.(*MemoryAccount); ok {
+			user := &info{
+				Id:       ma.ID.String(),
+				Security: ma.Security.String(),
+				Email:    mu.Email,
+				Level:    mu.Level,
+			}
+			users = append(users, user)
+		}
+	}
+
+	if j, err := json.MarshalIndent(users, "", "  "); err == nil {
+		return string(j), true
+	}
+	return "", false
 }
 
 func (v *TimedUserValidator) Add(u *protocol.MemoryUser) error {

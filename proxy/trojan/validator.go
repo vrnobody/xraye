@@ -1,6 +1,7 @@
 package trojan
 
 import (
+	"encoding/json"
 	"strings"
 	"sync"
 
@@ -48,4 +49,36 @@ func (v *Validator) Get(hash string) *protocol.MemoryUser {
 		return u.(*protocol.MemoryUser)
 	}
 	return nil
+}
+
+// GetAll users info.
+func (v *Validator) GetAll() (string, bool) {
+	type info struct {
+		Password string
+		Email    string
+		Level    uint32
+	}
+
+	// i know this approach is slow, PR is welcome
+	users := make([]*info, 0)
+
+	v.users.Range(func(_, value interface{}) bool {
+		if mu, ok := value.(*protocol.MemoryUser); ok {
+			if ma, ok := mu.Account.(*MemoryAccount); ok {
+				user := &info{
+					Password: ma.Password,
+					Email:    mu.Email,
+					Level:    mu.Level,
+				}
+				users = append(users, user)
+			}
+
+		}
+		return true
+	})
+
+	if j, err := json.MarshalIndent(users, "", "  "); err == nil {
+		return string(j), true
+	}
+	return "", false
 }

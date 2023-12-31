@@ -23,6 +23,7 @@ import (
 	feature_inbound "github.com/xtls/xray-core/features/inbound"
 	"github.com/xtls/xray-core/features/policy"
 	"github.com/xtls/xray-core/features/routing"
+	"github.com/xtls/xray-core/proxy"
 	"github.com/xtls/xray-core/proxy/vmess"
 	"github.com/xtls/xray-core/proxy/vmess/encoding"
 	"github.com/xtls/xray-core/transport/internet/stat"
@@ -117,6 +118,8 @@ func New(ctx context.Context, config *Config) (*Handler, error) {
 		sessionHistory:        encoding.NewSessionHistory(),
 	}
 
+	var _ proxy.UserManager = handler
+
 	for _, user := range config.User {
 		mUser, err := user.ToMemoryUser()
 		if err != nil {
@@ -149,6 +152,10 @@ func (h *Handler) GetUser(email string) *protocol.MemoryUser {
 		h.clients.Add(user)
 	}
 	return user
+}
+
+func (h *Handler) GetUsers(ctx context.Context) (string, bool) {
+	return h.clients.GetAll()
 }
 
 func (h *Handler) AddUser(ctx context.Context, user *protocol.MemoryUser) error {

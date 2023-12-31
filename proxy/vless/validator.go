@@ -1,6 +1,7 @@
 package vless
 
 import (
+	"encoding/json"
 	"strings"
 	"sync"
 
@@ -40,6 +41,40 @@ func (v *Validator) Del(e string) error {
 	v.email.Delete(le)
 	v.users.Delete(u.(*protocol.MemoryUser).Account.(*MemoryAccount).ID.UUID())
 	return nil
+}
+
+// GetAll users info.
+func (v *Validator) GetAll() (string, bool) {
+	type info struct {
+		Id    string
+		Flow  string
+		Email string
+		Level uint32
+	}
+
+	// i know this approach is slow, PR is welcome
+	users := make([]*info, 0)
+
+	v.users.Range(func(_, value interface{}) bool {
+		if mu, ok := value.(*protocol.MemoryUser); ok {
+			if ma, ok := mu.Account.(*MemoryAccount); ok {
+				user := &info{
+					Id:    ma.ID.String(),
+					Flow:  ma.Flow,
+					Email: mu.Email,
+					Level: mu.Level,
+				}
+				users = append(users, user)
+			}
+
+		}
+		return true
+	})
+
+	if j, err := json.MarshalIndent(users, "", "  "); err == nil {
+		return string(j), true
+	}
+	return "", false
 }
 
 // Get a VLESS user with UUID, nil if user doesn't exist.

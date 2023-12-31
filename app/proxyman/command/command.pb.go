@@ -23,6 +23,44 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type GetUsersOperation struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetUsersOperation) Reset() {
+	*x = GetUsersOperation{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_app_proxyman_command_command_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetUsersOperation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUsersOperation) ProtoMessage() {}
+
+func (x *GetUsersOperation) ProtoReflect() protoreflect.Message {
+	mi := &file_app_proxyman_command_command_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUsersOperation.ProtoReflect.Descriptor instead.
+func (*GetUsersOperation) Descriptor() ([]byte, []int) {
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{0}
+}
+
 type AddUserOperation struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -34,7 +72,7 @@ type AddUserOperation struct {
 func (x *AddUserOperation) Reset() {
 	*x = AddUserOperation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[0]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -47,7 +85,7 @@ func (x *AddUserOperation) String() string {
 func (*AddUserOperation) ProtoMessage() {}
 
 func (x *AddUserOperation) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[0]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +98,7 @@ func (x *AddUserOperation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddUserOperation.ProtoReflect.Descriptor instead.
 func (*AddUserOperation) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{0}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *AddUserOperation) GetUser() *protocol.User {
@@ -81,7 +119,7 @@ type RemoveUserOperation struct {
 func (x *RemoveUserOperation) Reset() {
 	*x = RemoveUserOperation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[1]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -94,7 +132,7 @@ func (x *RemoveUserOperation) String() string {
 func (*RemoveUserOperation) ProtoMessage() {}
 
 func (x *RemoveUserOperation) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[1]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +145,7 @@ func (x *RemoveUserOperation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveUserOperation.ProtoReflect.Descriptor instead.
 func (*RemoveUserOperation) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{1}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *RemoveUserOperation) GetEmail() string {
@@ -126,7 +164,7 @@ type GetAllInboundsRequest struct {
 func (x *GetAllInboundsRequest) Reset() {
 	*x = GetAllInboundsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[2]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -139,7 +177,7 @@ func (x *GetAllInboundsRequest) String() string {
 func (*GetAllInboundsRequest) ProtoMessage() {}
 
 func (x *GetAllInboundsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[2]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -152,7 +190,7 @@ func (x *GetAllInboundsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllInboundsRequest.ProtoReflect.Descriptor instead.
 func (*GetAllInboundsRequest) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{2}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{3}
 }
 
 type GetAllInboundsResponse struct {
@@ -166,7 +204,7 @@ type GetAllInboundsResponse struct {
 func (x *GetAllInboundsResponse) Reset() {
 	*x = GetAllInboundsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[3]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -179,7 +217,7 @@ func (x *GetAllInboundsResponse) String() string {
 func (*GetAllInboundsResponse) ProtoMessage() {}
 
 func (x *GetAllInboundsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[3]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -192,7 +230,7 @@ func (x *GetAllInboundsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllInboundsResponse.ProtoReflect.Descriptor instead.
 func (*GetAllInboundsResponse) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{3}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetAllInboundsResponse) GetConfigs() []*serial.TypedMessage {
@@ -213,7 +251,7 @@ type AddInboundRequest struct {
 func (x *AddInboundRequest) Reset() {
 	*x = AddInboundRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[4]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -226,7 +264,7 @@ func (x *AddInboundRequest) String() string {
 func (*AddInboundRequest) ProtoMessage() {}
 
 func (x *AddInboundRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[4]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -239,7 +277,7 @@ func (x *AddInboundRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddInboundRequest.ProtoReflect.Descriptor instead.
 func (*AddInboundRequest) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{4}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *AddInboundRequest) GetInbound() *core.InboundHandlerConfig {
@@ -258,7 +296,7 @@ type AddInboundResponse struct {
 func (x *AddInboundResponse) Reset() {
 	*x = AddInboundResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[5]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -271,7 +309,7 @@ func (x *AddInboundResponse) String() string {
 func (*AddInboundResponse) ProtoMessage() {}
 
 func (x *AddInboundResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[5]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -284,7 +322,7 @@ func (x *AddInboundResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddInboundResponse.ProtoReflect.Descriptor instead.
 func (*AddInboundResponse) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{5}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{6}
 }
 
 type RemoveInboundRequest struct {
@@ -298,7 +336,7 @@ type RemoveInboundRequest struct {
 func (x *RemoveInboundRequest) Reset() {
 	*x = RemoveInboundRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[6]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -311,7 +349,7 @@ func (x *RemoveInboundRequest) String() string {
 func (*RemoveInboundRequest) ProtoMessage() {}
 
 func (x *RemoveInboundRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[6]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -324,7 +362,7 @@ func (x *RemoveInboundRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveInboundRequest.ProtoReflect.Descriptor instead.
 func (*RemoveInboundRequest) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{6}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *RemoveInboundRequest) GetTag() string {
@@ -343,7 +381,7 @@ type RemoveInboundResponse struct {
 func (x *RemoveInboundResponse) Reset() {
 	*x = RemoveInboundResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[7]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -356,7 +394,7 @@ func (x *RemoveInboundResponse) String() string {
 func (*RemoveInboundResponse) ProtoMessage() {}
 
 func (x *RemoveInboundResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[7]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -369,7 +407,7 @@ func (x *RemoveInboundResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveInboundResponse.ProtoReflect.Descriptor instead.
 func (*RemoveInboundResponse) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{7}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{8}
 }
 
 type AlterInboundRequest struct {
@@ -384,7 +422,7 @@ type AlterInboundRequest struct {
 func (x *AlterInboundRequest) Reset() {
 	*x = AlterInboundRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[8]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -397,7 +435,7 @@ func (x *AlterInboundRequest) String() string {
 func (*AlterInboundRequest) ProtoMessage() {}
 
 func (x *AlterInboundRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[8]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -410,7 +448,7 @@ func (x *AlterInboundRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AlterInboundRequest.ProtoReflect.Descriptor instead.
 func (*AlterInboundRequest) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{8}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *AlterInboundRequest) GetTag() string {
@@ -436,7 +474,7 @@ type AlterInboundResponse struct {
 func (x *AlterInboundResponse) Reset() {
 	*x = AlterInboundResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[9]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -449,7 +487,7 @@ func (x *AlterInboundResponse) String() string {
 func (*AlterInboundResponse) ProtoMessage() {}
 
 func (x *AlterInboundResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[9]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -462,7 +500,109 @@ func (x *AlterInboundResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AlterInboundResponse.ProtoReflect.Descriptor instead.
 func (*AlterInboundResponse) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{9}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{10}
+}
+
+type QueryInboundRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Tag       string               `protobuf:"bytes,1,opt,name=tag,proto3" json:"tag,omitempty"`
+	Operation *serial.TypedMessage `protobuf:"bytes,2,opt,name=operation,proto3" json:"operation,omitempty"`
+}
+
+func (x *QueryInboundRequest) Reset() {
+	*x = QueryInboundRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_app_proxyman_command_command_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryInboundRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryInboundRequest) ProtoMessage() {}
+
+func (x *QueryInboundRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_app_proxyman_command_command_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryInboundRequest.ProtoReflect.Descriptor instead.
+func (*QueryInboundRequest) Descriptor() ([]byte, []int) {
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *QueryInboundRequest) GetTag() string {
+	if x != nil {
+		return x.Tag
+	}
+	return ""
+}
+
+func (x *QueryInboundRequest) GetOperation() *serial.TypedMessage {
+	if x != nil {
+		return x.Operation
+	}
+	return nil
+}
+
+type QueryInboundResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Content string `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+}
+
+func (x *QueryInboundResponse) Reset() {
+	*x = QueryInboundResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_app_proxyman_command_command_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryInboundResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryInboundResponse) ProtoMessage() {}
+
+func (x *QueryInboundResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_app_proxyman_command_command_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryInboundResponse.ProtoReflect.Descriptor instead.
+func (*QueryInboundResponse) Descriptor() ([]byte, []int) {
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *QueryInboundResponse) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
 }
 
 type GetAllOutboundsRequest struct {
@@ -474,7 +614,7 @@ type GetAllOutboundsRequest struct {
 func (x *GetAllOutboundsRequest) Reset() {
 	*x = GetAllOutboundsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[10]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -487,7 +627,7 @@ func (x *GetAllOutboundsRequest) String() string {
 func (*GetAllOutboundsRequest) ProtoMessage() {}
 
 func (x *GetAllOutboundsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[10]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -500,7 +640,7 @@ func (x *GetAllOutboundsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllOutboundsRequest.ProtoReflect.Descriptor instead.
 func (*GetAllOutboundsRequest) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{10}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{13}
 }
 
 type GetAllOutboundsResponse struct {
@@ -514,7 +654,7 @@ type GetAllOutboundsResponse struct {
 func (x *GetAllOutboundsResponse) Reset() {
 	*x = GetAllOutboundsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[11]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -527,7 +667,7 @@ func (x *GetAllOutboundsResponse) String() string {
 func (*GetAllOutboundsResponse) ProtoMessage() {}
 
 func (x *GetAllOutboundsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[11]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -540,7 +680,7 @@ func (x *GetAllOutboundsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllOutboundsResponse.ProtoReflect.Descriptor instead.
 func (*GetAllOutboundsResponse) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{11}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetAllOutboundsResponse) GetConfigs() []*serial.TypedMessage {
@@ -561,7 +701,7 @@ type AddOutboundRequest struct {
 func (x *AddOutboundRequest) Reset() {
 	*x = AddOutboundRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[12]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -574,7 +714,7 @@ func (x *AddOutboundRequest) String() string {
 func (*AddOutboundRequest) ProtoMessage() {}
 
 func (x *AddOutboundRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[12]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -587,7 +727,7 @@ func (x *AddOutboundRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddOutboundRequest.ProtoReflect.Descriptor instead.
 func (*AddOutboundRequest) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{12}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *AddOutboundRequest) GetOutbound() *core.OutboundHandlerConfig {
@@ -606,7 +746,7 @@ type AddOutboundResponse struct {
 func (x *AddOutboundResponse) Reset() {
 	*x = AddOutboundResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[13]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -619,7 +759,7 @@ func (x *AddOutboundResponse) String() string {
 func (*AddOutboundResponse) ProtoMessage() {}
 
 func (x *AddOutboundResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[13]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -632,7 +772,7 @@ func (x *AddOutboundResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddOutboundResponse.ProtoReflect.Descriptor instead.
 func (*AddOutboundResponse) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{13}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{16}
 }
 
 type RemoveOutboundRequest struct {
@@ -646,7 +786,7 @@ type RemoveOutboundRequest struct {
 func (x *RemoveOutboundRequest) Reset() {
 	*x = RemoveOutboundRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[14]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -659,7 +799,7 @@ func (x *RemoveOutboundRequest) String() string {
 func (*RemoveOutboundRequest) ProtoMessage() {}
 
 func (x *RemoveOutboundRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[14]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -672,7 +812,7 @@ func (x *RemoveOutboundRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveOutboundRequest.ProtoReflect.Descriptor instead.
 func (*RemoveOutboundRequest) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{14}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *RemoveOutboundRequest) GetTag() string {
@@ -691,7 +831,7 @@ type RemoveOutboundResponse struct {
 func (x *RemoveOutboundResponse) Reset() {
 	*x = RemoveOutboundResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[15]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -704,7 +844,7 @@ func (x *RemoveOutboundResponse) String() string {
 func (*RemoveOutboundResponse) ProtoMessage() {}
 
 func (x *RemoveOutboundResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[15]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -717,7 +857,7 @@ func (x *RemoveOutboundResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveOutboundResponse.ProtoReflect.Descriptor instead.
 func (*RemoveOutboundResponse) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{15}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{18}
 }
 
 type AlterOutboundRequest struct {
@@ -732,7 +872,7 @@ type AlterOutboundRequest struct {
 func (x *AlterOutboundRequest) Reset() {
 	*x = AlterOutboundRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[16]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -745,7 +885,7 @@ func (x *AlterOutboundRequest) String() string {
 func (*AlterOutboundRequest) ProtoMessage() {}
 
 func (x *AlterOutboundRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[16]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -758,7 +898,7 @@ func (x *AlterOutboundRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AlterOutboundRequest.ProtoReflect.Descriptor instead.
 func (*AlterOutboundRequest) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{16}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *AlterOutboundRequest) GetTag() string {
@@ -784,7 +924,7 @@ type AlterOutboundResponse struct {
 func (x *AlterOutboundResponse) Reset() {
 	*x = AlterOutboundResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[17]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -797,7 +937,7 @@ func (x *AlterOutboundResponse) String() string {
 func (*AlterOutboundResponse) ProtoMessage() {}
 
 func (x *AlterOutboundResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[17]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -810,7 +950,7 @@ func (x *AlterOutboundResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AlterOutboundResponse.ProtoReflect.Descriptor instead.
 func (*AlterOutboundResponse) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{17}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{20}
 }
 
 type Config struct {
@@ -822,7 +962,7 @@ type Config struct {
 func (x *Config) Reset() {
 	*x = Config{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_proxyman_command_command_proto_msgTypes[18]
+		mi := &file_app_proxyman_command_command_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -835,7 +975,7 @@ func (x *Config) String() string {
 func (*Config) ProtoMessage() {}
 
 func (x *Config) ProtoReflect() protoreflect.Message {
-	mi := &file_app_proxyman_command_command_proto_msgTypes[18]
+	mi := &file_app_proxyman_command_command_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -848,7 +988,7 @@ func (x *Config) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Config.ProtoReflect.Descriptor instead.
 func (*Config) Descriptor() ([]byte, []int) {
-	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{18}
+	return file_app_proxyman_command_command_proto_rawDescGZIP(), []int{21}
 }
 
 var File_app_proxyman_command_command_proto protoreflect.FileDescriptor
@@ -863,39 +1003,50 @@ var file_app_proxyman_command_command_proto_rawDesc = []byte{
 	0x6d, 0x6f, 0x6e, 0x2f, 0x73, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x2f, 0x74, 0x79, 0x70, 0x65, 0x64,
 	0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x11,
 	0x63, 0x6f, 0x72, 0x65, 0x2f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x22, 0x42, 0x0a, 0x10, 0x41, 0x64, 0x64, 0x55, 0x73, 0x65, 0x72, 0x4f, 0x70, 0x65, 0x72,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x2e, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x72, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f,
-	0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52,
-	0x04, 0x75, 0x73, 0x65, 0x72, 0x22, 0x2b, 0x0a, 0x13, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x55,
-	0x73, 0x65, 0x72, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x05,
-	0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x6d, 0x61,
-	0x69, 0x6c, 0x22, 0x17, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x49, 0x6e, 0x62, 0x6f,
-	0x75, 0x6e, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x54, 0x0a, 0x16, 0x47,
-	0x65, 0x74, 0x41, 0x6c, 0x6c, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3a, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x73,
-	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x63, 0x6f,
-	0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x73, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x2e, 0x54, 0x79, 0x70, 0x65,
-	0x64, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67,
-	0x73, 0x22, 0x4e, 0x0a, 0x11, 0x41, 0x64, 0x64, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x39, 0x0a, 0x07, 0x69, 0x6e, 0x62, 0x6f, 0x75, 0x6e,
-	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x63,
-	0x6f, 0x72, 0x65, 0x2e, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x48, 0x61, 0x6e, 0x64, 0x6c,
-	0x65, 0x72, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x07, 0x69, 0x6e, 0x62, 0x6f, 0x75, 0x6e,
-	0x64, 0x22, 0x14, 0x0a, 0x12, 0x41, 0x64, 0x64, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x28, 0x0a, 0x14, 0x52, 0x65, 0x6d, 0x6f, 0x76,
-	0x65, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
-	0x10, 0x0a, 0x03, 0x74, 0x61, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x74, 0x61,
-	0x67, 0x22, 0x17, 0x0a, 0x15, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x49, 0x6e, 0x62, 0x6f, 0x75,
-	0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x67, 0x0a, 0x13, 0x41, 0x6c,
-	0x74, 0x65, 0x72, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x10, 0x0a, 0x03, 0x74, 0x61, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
-	0x74, 0x61, 0x67, 0x12, 0x3e, 0x0a, 0x09, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x63, 0x6f,
-	0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x73, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x2e, 0x54, 0x79, 0x70, 0x65,
-	0x64, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x52, 0x09, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x22, 0x16, 0x0a, 0x14, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x49, 0x6e, 0x62, 0x6f,
-	0x75, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x18, 0x0a, 0x16, 0x47,
+	0x6f, 0x22, 0x13, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x73, 0x4f, 0x70, 0x65,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x42, 0x0a, 0x10, 0x41, 0x64, 0x64, 0x55, 0x73, 0x65,
+	0x72, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x2e, 0x0a, 0x04, 0x75, 0x73,
+	0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e,
+	0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2e,
+	0x55, 0x73, 0x65, 0x72, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x22, 0x2b, 0x0a, 0x13, 0x52, 0x65,
+	0x6d, 0x6f, 0x76, 0x65, 0x55, 0x73, 0x65, 0x72, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x22, 0x17, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x41, 0x6c,
+	0x6c, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x22, 0x54, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e,
+	0x64, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3a, 0x0a, 0x07, 0x63, 0x6f,
+	0x6e, 0x66, 0x69, 0x67, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x78, 0x72,
+	0x61, 0x79, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x73, 0x65, 0x72, 0x69, 0x61, 0x6c,
+	0x2e, 0x54, 0x79, 0x70, 0x65, 0x64, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x52, 0x07, 0x63,
+	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x73, 0x22, 0x4e, 0x0a, 0x11, 0x41, 0x64, 0x64, 0x49, 0x6e, 0x62,
+	0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x39, 0x0a, 0x07, 0x69,
+	0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x78,
+	0x72, 0x61, 0x79, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64,
+	0x48, 0x61, 0x6e, 0x64, 0x6c, 0x65, 0x72, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x07, 0x69,
+	0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x22, 0x14, 0x0a, 0x12, 0x41, 0x64, 0x64, 0x49, 0x6e, 0x62,
+	0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x28, 0x0a, 0x14,
+	0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x74, 0x61, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x74, 0x61, 0x67, 0x22, 0x17, 0x0a, 0x15, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65,
+	0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x67, 0x0a, 0x13, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x74, 0x61, 0x67, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x03, 0x74, 0x61, 0x67, 0x12, 0x3e, 0x0a, 0x09, 0x6f, 0x70, 0x65, 0x72,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x78, 0x72,
+	0x61, 0x79, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x73, 0x65, 0x72, 0x69, 0x61, 0x6c,
+	0x2e, 0x54, 0x79, 0x70, 0x65, 0x64, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x52, 0x09, 0x6f,
+	0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x16, 0x0a, 0x14, 0x41, 0x6c, 0x74, 0x65,
+	0x72, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x67, 0x0a, 0x13, 0x51, 0x75, 0x65, 0x72, 0x79, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x74, 0x61, 0x67, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x74, 0x61, 0x67, 0x12, 0x3e, 0x0a, 0x09, 0x6f, 0x70, 0x65,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x78,
+	0x72, 0x61, 0x79, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x73, 0x65, 0x72, 0x69, 0x61,
+	0x6c, 0x2e, 0x54, 0x79, 0x70, 0x65, 0x64, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x52, 0x09,
+	0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x30, 0x0a, 0x14, 0x51, 0x75, 0x65,
+	0x72, 0x79, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x18, 0x0a, 0x16, 0x47,
 	0x65, 0x74, 0x41, 0x6c, 0x6c, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x52, 0x65,
 	0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x55, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x4f,
 	0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
@@ -922,7 +1073,7 @@ var file_app_proxyman_command_command_proto_rawDesc = []byte{
 	0x79, 0x70, 0x65, 0x64, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x52, 0x09, 0x6f, 0x70, 0x65,
 	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x17, 0x0a, 0x15, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x4f,
 	0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0x08, 0x0a, 0x06, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x32, 0xba, 0x07, 0x0a, 0x0e, 0x48, 0x61,
+	0x08, 0x0a, 0x06, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x32, 0xad, 0x08, 0x0a, 0x0e, 0x48, 0x61,
 	0x6e, 0x64, 0x6c, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x77, 0x0a, 0x0e,
 	0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x12, 0x30,
 	0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d,
@@ -952,44 +1103,51 @@ var file_app_proxyman_command_command_proto_rawDesc = []byte{
 	0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2f, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e,
 	0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d,
 	0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e,
-	0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x7a, 0x0a, 0x0f, 0x47,
-	0x65, 0x74, 0x41, 0x6c, 0x6c, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x12, 0x31,
-	0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d,
-	0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x47, 0x65, 0x74, 0x41, 0x6c,
-	0x6c, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x32, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f,
+	0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x71, 0x0a, 0x0c, 0x51,
+	0x75, 0x65, 0x72, 0x79, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x12, 0x2e, 0x2e, 0x78, 0x72,
+	0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e,
+	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x49, 0x6e, 0x62,
+	0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2f, 0x2e, 0x78, 0x72,
+	0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e,
+	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x49, 0x6e, 0x62,
+	0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x7a,
+	0x0a, 0x0f, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64,
+	0x73, 0x12, 0x31, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f,
 	0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x47, 0x65,
-	0x74, 0x41, 0x6c, 0x6c, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x6e, 0x0a, 0x0b, 0x41, 0x64, 0x64, 0x4f, 0x75,
-	0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x12, 0x2d, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70,
-	0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61,
-	0x6e, 0x64, 0x2e, 0x41, 0x64, 0x64, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2e, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70,
-	0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e,
-	0x64, 0x2e, 0x41, 0x64, 0x64, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x77, 0x0a, 0x0e, 0x52, 0x65, 0x6d, 0x6f, 0x76,
-	0x65, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x12, 0x30, 0x2e, 0x78, 0x72, 0x61, 0x79,
+	0x74, 0x41, 0x6c, 0x6c, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x32, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e,
+	0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64,
+	0x2e, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x73,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x6e, 0x0a, 0x0b, 0x41, 0x64,
+	0x64, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x12, 0x2d, 0x2e, 0x78, 0x72, 0x61, 0x79,
 	0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f,
-	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x4f, 0x75, 0x74, 0x62,
-	0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x31, 0x2e, 0x78, 0x72,
-	0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e,
-	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x4f, 0x75,
-	0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
-	0x12, 0x74, 0x0a, 0x0d, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e,
-	0x64, 0x12, 0x2f, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f,
-	0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x41, 0x6c,
-	0x74, 0x65, 0x72, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x30, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72,
-	0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x41,
-	0x6c, 0x74, 0x65, 0x72, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x6d, 0x0a, 0x1d, 0x63, 0x6f, 0x6d, 0x2e, 0x78, 0x72,
-	0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e,
-	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x50, 0x01, 0x5a, 0x2e, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x74, 0x6c, 0x73, 0x2f, 0x78, 0x72, 0x61, 0x79, 0x2d,
-	0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x70, 0x2f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61,
-	0x6e, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0xaa, 0x02, 0x19, 0x58, 0x72, 0x61, 0x79,
-	0x2e, 0x41, 0x70, 0x70, 0x2e, 0x50, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x43, 0x6f,
-	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x41, 0x64, 0x64, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e,
+	0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2e, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e,
+	0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d,
+	0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x41, 0x64, 0x64, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x77, 0x0a, 0x0e, 0x52, 0x65,
+	0x6d, 0x6f, 0x76, 0x65, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x12, 0x30, 0x2e, 0x78,
+	0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e,
+	0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x4f,
+	0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x31,
+	0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d,
+	0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x52, 0x65, 0x6d, 0x6f, 0x76,
+	0x65, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x00, 0x12, 0x74, 0x0a, 0x0d, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x4f, 0x75, 0x74, 0x62,
+	0x6f, 0x75, 0x6e, 0x64, 0x12, 0x2f, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e,
+	0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64,
+	0x2e, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x30, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70,
+	0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e,
+	0x64, 0x2e, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x4f, 0x75, 0x74, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x6d, 0x0a, 0x1d, 0x63, 0x6f, 0x6d,
+	0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x6d,
+	0x61, 0x6e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x50, 0x01, 0x5a, 0x2e, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x74, 0x6c, 0x73, 0x2f, 0x78, 0x72,
+	0x61, 0x79, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x70, 0x2f, 0x70, 0x72, 0x6f, 0x78,
+	0x79, 0x6d, 0x61, 0x6e, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0xaa, 0x02, 0x19, 0x58,
+	0x72, 0x61, 0x79, 0x2e, 0x41, 0x70, 0x70, 0x2e, 0x50, 0x72, 0x6f, 0x78, 0x79, 0x6d, 0x61, 0x6e,
+	0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1004,61 +1162,67 @@ func file_app_proxyman_command_command_proto_rawDescGZIP() []byte {
 	return file_app_proxyman_command_command_proto_rawDescData
 }
 
-var file_app_proxyman_command_command_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_app_proxyman_command_command_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_app_proxyman_command_command_proto_goTypes = []interface{}{
-	(*AddUserOperation)(nil),           // 0: xray.app.proxyman.command.AddUserOperation
-	(*RemoveUserOperation)(nil),        // 1: xray.app.proxyman.command.RemoveUserOperation
-	(*GetAllInboundsRequest)(nil),      // 2: xray.app.proxyman.command.GetAllInboundsRequest
-	(*GetAllInboundsResponse)(nil),     // 3: xray.app.proxyman.command.GetAllInboundsResponse
-	(*AddInboundRequest)(nil),          // 4: xray.app.proxyman.command.AddInboundRequest
-	(*AddInboundResponse)(nil),         // 5: xray.app.proxyman.command.AddInboundResponse
-	(*RemoveInboundRequest)(nil),       // 6: xray.app.proxyman.command.RemoveInboundRequest
-	(*RemoveInboundResponse)(nil),      // 7: xray.app.proxyman.command.RemoveInboundResponse
-	(*AlterInboundRequest)(nil),        // 8: xray.app.proxyman.command.AlterInboundRequest
-	(*AlterInboundResponse)(nil),       // 9: xray.app.proxyman.command.AlterInboundResponse
-	(*GetAllOutboundsRequest)(nil),     // 10: xray.app.proxyman.command.GetAllOutboundsRequest
-	(*GetAllOutboundsResponse)(nil),    // 11: xray.app.proxyman.command.GetAllOutboundsResponse
-	(*AddOutboundRequest)(nil),         // 12: xray.app.proxyman.command.AddOutboundRequest
-	(*AddOutboundResponse)(nil),        // 13: xray.app.proxyman.command.AddOutboundResponse
-	(*RemoveOutboundRequest)(nil),      // 14: xray.app.proxyman.command.RemoveOutboundRequest
-	(*RemoveOutboundResponse)(nil),     // 15: xray.app.proxyman.command.RemoveOutboundResponse
-	(*AlterOutboundRequest)(nil),       // 16: xray.app.proxyman.command.AlterOutboundRequest
-	(*AlterOutboundResponse)(nil),      // 17: xray.app.proxyman.command.AlterOutboundResponse
-	(*Config)(nil),                     // 18: xray.app.proxyman.command.Config
-	(*protocol.User)(nil),              // 19: xray.common.protocol.User
-	(*serial.TypedMessage)(nil),        // 20: xray.common.serial.TypedMessage
-	(*core.InboundHandlerConfig)(nil),  // 21: xray.core.InboundHandlerConfig
-	(*core.OutboundHandlerConfig)(nil), // 22: xray.core.OutboundHandlerConfig
+	(*GetUsersOperation)(nil),          // 0: xray.app.proxyman.command.GetUsersOperation
+	(*AddUserOperation)(nil),           // 1: xray.app.proxyman.command.AddUserOperation
+	(*RemoveUserOperation)(nil),        // 2: xray.app.proxyman.command.RemoveUserOperation
+	(*GetAllInboundsRequest)(nil),      // 3: xray.app.proxyman.command.GetAllInboundsRequest
+	(*GetAllInboundsResponse)(nil),     // 4: xray.app.proxyman.command.GetAllInboundsResponse
+	(*AddInboundRequest)(nil),          // 5: xray.app.proxyman.command.AddInboundRequest
+	(*AddInboundResponse)(nil),         // 6: xray.app.proxyman.command.AddInboundResponse
+	(*RemoveInboundRequest)(nil),       // 7: xray.app.proxyman.command.RemoveInboundRequest
+	(*RemoveInboundResponse)(nil),      // 8: xray.app.proxyman.command.RemoveInboundResponse
+	(*AlterInboundRequest)(nil),        // 9: xray.app.proxyman.command.AlterInboundRequest
+	(*AlterInboundResponse)(nil),       // 10: xray.app.proxyman.command.AlterInboundResponse
+	(*QueryInboundRequest)(nil),        // 11: xray.app.proxyman.command.QueryInboundRequest
+	(*QueryInboundResponse)(nil),       // 12: xray.app.proxyman.command.QueryInboundResponse
+	(*GetAllOutboundsRequest)(nil),     // 13: xray.app.proxyman.command.GetAllOutboundsRequest
+	(*GetAllOutboundsResponse)(nil),    // 14: xray.app.proxyman.command.GetAllOutboundsResponse
+	(*AddOutboundRequest)(nil),         // 15: xray.app.proxyman.command.AddOutboundRequest
+	(*AddOutboundResponse)(nil),        // 16: xray.app.proxyman.command.AddOutboundResponse
+	(*RemoveOutboundRequest)(nil),      // 17: xray.app.proxyman.command.RemoveOutboundRequest
+	(*RemoveOutboundResponse)(nil),     // 18: xray.app.proxyman.command.RemoveOutboundResponse
+	(*AlterOutboundRequest)(nil),       // 19: xray.app.proxyman.command.AlterOutboundRequest
+	(*AlterOutboundResponse)(nil),      // 20: xray.app.proxyman.command.AlterOutboundResponse
+	(*Config)(nil),                     // 21: xray.app.proxyman.command.Config
+	(*protocol.User)(nil),              // 22: xray.common.protocol.User
+	(*serial.TypedMessage)(nil),        // 23: xray.common.serial.TypedMessage
+	(*core.InboundHandlerConfig)(nil),  // 24: xray.core.InboundHandlerConfig
+	(*core.OutboundHandlerConfig)(nil), // 25: xray.core.OutboundHandlerConfig
 }
 var file_app_proxyman_command_command_proto_depIdxs = []int32{
-	19, // 0: xray.app.proxyman.command.AddUserOperation.user:type_name -> xray.common.protocol.User
-	20, // 1: xray.app.proxyman.command.GetAllInboundsResponse.configs:type_name -> xray.common.serial.TypedMessage
-	21, // 2: xray.app.proxyman.command.AddInboundRequest.inbound:type_name -> xray.core.InboundHandlerConfig
-	20, // 3: xray.app.proxyman.command.AlterInboundRequest.operation:type_name -> xray.common.serial.TypedMessage
-	20, // 4: xray.app.proxyman.command.GetAllOutboundsResponse.configs:type_name -> xray.common.serial.TypedMessage
-	22, // 5: xray.app.proxyman.command.AddOutboundRequest.outbound:type_name -> xray.core.OutboundHandlerConfig
-	20, // 6: xray.app.proxyman.command.AlterOutboundRequest.operation:type_name -> xray.common.serial.TypedMessage
-	2,  // 7: xray.app.proxyman.command.HandlerService.GetAllInbounds:input_type -> xray.app.proxyman.command.GetAllInboundsRequest
-	4,  // 8: xray.app.proxyman.command.HandlerService.AddInbound:input_type -> xray.app.proxyman.command.AddInboundRequest
-	6,  // 9: xray.app.proxyman.command.HandlerService.RemoveInbound:input_type -> xray.app.proxyman.command.RemoveInboundRequest
-	8,  // 10: xray.app.proxyman.command.HandlerService.AlterInbound:input_type -> xray.app.proxyman.command.AlterInboundRequest
-	10, // 11: xray.app.proxyman.command.HandlerService.GetAllOutbounds:input_type -> xray.app.proxyman.command.GetAllOutboundsRequest
-	12, // 12: xray.app.proxyman.command.HandlerService.AddOutbound:input_type -> xray.app.proxyman.command.AddOutboundRequest
-	14, // 13: xray.app.proxyman.command.HandlerService.RemoveOutbound:input_type -> xray.app.proxyman.command.RemoveOutboundRequest
-	16, // 14: xray.app.proxyman.command.HandlerService.AlterOutbound:input_type -> xray.app.proxyman.command.AlterOutboundRequest
-	3,  // 15: xray.app.proxyman.command.HandlerService.GetAllInbounds:output_type -> xray.app.proxyman.command.GetAllInboundsResponse
-	5,  // 16: xray.app.proxyman.command.HandlerService.AddInbound:output_type -> xray.app.proxyman.command.AddInboundResponse
-	7,  // 17: xray.app.proxyman.command.HandlerService.RemoveInbound:output_type -> xray.app.proxyman.command.RemoveInboundResponse
-	9,  // 18: xray.app.proxyman.command.HandlerService.AlterInbound:output_type -> xray.app.proxyman.command.AlterInboundResponse
-	11, // 19: xray.app.proxyman.command.HandlerService.GetAllOutbounds:output_type -> xray.app.proxyman.command.GetAllOutboundsResponse
-	13, // 20: xray.app.proxyman.command.HandlerService.AddOutbound:output_type -> xray.app.proxyman.command.AddOutboundResponse
-	15, // 21: xray.app.proxyman.command.HandlerService.RemoveOutbound:output_type -> xray.app.proxyman.command.RemoveOutboundResponse
-	17, // 22: xray.app.proxyman.command.HandlerService.AlterOutbound:output_type -> xray.app.proxyman.command.AlterOutboundResponse
-	15, // [15:23] is the sub-list for method output_type
-	7,  // [7:15] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	22, // 0: xray.app.proxyman.command.AddUserOperation.user:type_name -> xray.common.protocol.User
+	23, // 1: xray.app.proxyman.command.GetAllInboundsResponse.configs:type_name -> xray.common.serial.TypedMessage
+	24, // 2: xray.app.proxyman.command.AddInboundRequest.inbound:type_name -> xray.core.InboundHandlerConfig
+	23, // 3: xray.app.proxyman.command.AlterInboundRequest.operation:type_name -> xray.common.serial.TypedMessage
+	23, // 4: xray.app.proxyman.command.QueryInboundRequest.operation:type_name -> xray.common.serial.TypedMessage
+	23, // 5: xray.app.proxyman.command.GetAllOutboundsResponse.configs:type_name -> xray.common.serial.TypedMessage
+	25, // 6: xray.app.proxyman.command.AddOutboundRequest.outbound:type_name -> xray.core.OutboundHandlerConfig
+	23, // 7: xray.app.proxyman.command.AlterOutboundRequest.operation:type_name -> xray.common.serial.TypedMessage
+	3,  // 8: xray.app.proxyman.command.HandlerService.GetAllInbounds:input_type -> xray.app.proxyman.command.GetAllInboundsRequest
+	5,  // 9: xray.app.proxyman.command.HandlerService.AddInbound:input_type -> xray.app.proxyman.command.AddInboundRequest
+	7,  // 10: xray.app.proxyman.command.HandlerService.RemoveInbound:input_type -> xray.app.proxyman.command.RemoveInboundRequest
+	9,  // 11: xray.app.proxyman.command.HandlerService.AlterInbound:input_type -> xray.app.proxyman.command.AlterInboundRequest
+	11, // 12: xray.app.proxyman.command.HandlerService.QueryInbound:input_type -> xray.app.proxyman.command.QueryInboundRequest
+	13, // 13: xray.app.proxyman.command.HandlerService.GetAllOutbounds:input_type -> xray.app.proxyman.command.GetAllOutboundsRequest
+	15, // 14: xray.app.proxyman.command.HandlerService.AddOutbound:input_type -> xray.app.proxyman.command.AddOutboundRequest
+	17, // 15: xray.app.proxyman.command.HandlerService.RemoveOutbound:input_type -> xray.app.proxyman.command.RemoveOutboundRequest
+	19, // 16: xray.app.proxyman.command.HandlerService.AlterOutbound:input_type -> xray.app.proxyman.command.AlterOutboundRequest
+	4,  // 17: xray.app.proxyman.command.HandlerService.GetAllInbounds:output_type -> xray.app.proxyman.command.GetAllInboundsResponse
+	6,  // 18: xray.app.proxyman.command.HandlerService.AddInbound:output_type -> xray.app.proxyman.command.AddInboundResponse
+	8,  // 19: xray.app.proxyman.command.HandlerService.RemoveInbound:output_type -> xray.app.proxyman.command.RemoveInboundResponse
+	10, // 20: xray.app.proxyman.command.HandlerService.AlterInbound:output_type -> xray.app.proxyman.command.AlterInboundResponse
+	12, // 21: xray.app.proxyman.command.HandlerService.QueryInbound:output_type -> xray.app.proxyman.command.QueryInboundResponse
+	14, // 22: xray.app.proxyman.command.HandlerService.GetAllOutbounds:output_type -> xray.app.proxyman.command.GetAllOutboundsResponse
+	16, // 23: xray.app.proxyman.command.HandlerService.AddOutbound:output_type -> xray.app.proxyman.command.AddOutboundResponse
+	18, // 24: xray.app.proxyman.command.HandlerService.RemoveOutbound:output_type -> xray.app.proxyman.command.RemoveOutboundResponse
+	20, // 25: xray.app.proxyman.command.HandlerService.AlterOutbound:output_type -> xray.app.proxyman.command.AlterOutboundResponse
+	17, // [17:26] is the sub-list for method output_type
+	8,  // [8:17] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_app_proxyman_command_command_proto_init() }
@@ -1068,7 +1232,7 @@ func file_app_proxyman_command_command_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_app_proxyman_command_command_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddUserOperation); i {
+			switch v := v.(*GetUsersOperation); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1080,7 +1244,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RemoveUserOperation); i {
+			switch v := v.(*AddUserOperation); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1092,7 +1256,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAllInboundsRequest); i {
+			switch v := v.(*RemoveUserOperation); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1104,7 +1268,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAllInboundsResponse); i {
+			switch v := v.(*GetAllInboundsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1116,7 +1280,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddInboundRequest); i {
+			switch v := v.(*GetAllInboundsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1128,7 +1292,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddInboundResponse); i {
+			switch v := v.(*AddInboundRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1140,7 +1304,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RemoveInboundRequest); i {
+			switch v := v.(*AddInboundResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1152,7 +1316,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RemoveInboundResponse); i {
+			switch v := v.(*RemoveInboundRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1164,7 +1328,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AlterInboundRequest); i {
+			switch v := v.(*RemoveInboundResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1176,7 +1340,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AlterInboundResponse); i {
+			switch v := v.(*AlterInboundRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1188,7 +1352,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAllOutboundsRequest); i {
+			switch v := v.(*AlterInboundResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1200,7 +1364,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAllOutboundsResponse); i {
+			switch v := v.(*QueryInboundRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1212,7 +1376,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddOutboundRequest); i {
+			switch v := v.(*QueryInboundResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1224,7 +1388,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddOutboundResponse); i {
+			switch v := v.(*GetAllOutboundsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1236,7 +1400,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RemoveOutboundRequest); i {
+			switch v := v.(*GetAllOutboundsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1248,7 +1412,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RemoveOutboundResponse); i {
+			switch v := v.(*AddOutboundRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1260,7 +1424,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AlterOutboundRequest); i {
+			switch v := v.(*AddOutboundResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1272,7 +1436,7 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AlterOutboundResponse); i {
+			switch v := v.(*RemoveOutboundRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1284,6 +1448,42 @@ func file_app_proxyman_command_command_proto_init() {
 			}
 		}
 		file_app_proxyman_command_command_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RemoveOutboundResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_app_proxyman_command_command_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AlterOutboundRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_app_proxyman_command_command_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AlterOutboundResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_app_proxyman_command_command_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Config); i {
 			case 0:
 				return &v.state
@@ -1302,7 +1502,7 @@ func file_app_proxyman_command_command_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_app_proxyman_command_command_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

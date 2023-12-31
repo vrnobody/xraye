@@ -69,6 +69,8 @@ func New(ctx context.Context, config *Config, dc dns.Client) (*Handler, error) {
 		dns:                   dc,
 	}
 
+	var _ proxy.UserManager = handler
+
 	for _, user := range config.Clients {
 		u, err := user.ToMemoryUser()
 		if err != nil {
@@ -168,6 +170,11 @@ func (h *Handler) AddUser(ctx context.Context, u *protocol.MemoryUser) error {
 // RemoveUser implements proxy.UserManager.RemoveUser().
 func (h *Handler) RemoveUser(ctx context.Context, e string) error {
 	return h.validator.Del(e)
+}
+
+// GetUsers implements proxy.UserManager.GetUsers().
+func (h *Handler) GetUsers(ctx context.Context) (string, bool) {
+	return h.validator.GetAll()
 }
 
 // Network implements proxy.Inbound.Network().

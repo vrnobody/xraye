@@ -28,6 +28,12 @@ type OutboundOperation interface {
 	ApplyOutbound(context.Context, outbound.Handler) error
 }
 
+// InboundQueryOperation is the interface for query operations that applies to inbound handlers.
+type InboundQueryOperation interface {
+	// ApplyInbound applies this operation to the given inbound handler.
+	QueryInbound(context.Context, inbound.Handler) (string, error)
+}
+
 func getInbound(handler inbound.Handler) (proxy.Inbound, error) {
 	gi, ok := handler.(proxy.GetInbound)
 	if !ok {
@@ -64,6 +70,21 @@ func (op *RemoveUserOperation) ApplyInbound(ctx context.Context, handler inbound
 		return newError("proxy is not a UserManager")
 	}
 	return um.RemoveUser(ctx, op.Email)
+}
+
+func (op *GetUsersOperation) QueryInbound(ctx context.Context, handler inbound.Handler) (string, error) {
+	p, err := getInbound(handler)
+	if err != nil {
+		return "", err
+	}
+	um, ok := p.(proxy.UserManager)
+	if !ok {
+		return "", newError("proxy is not a UserManager")
+	}
+	if content, ok := um.GetUsers(ctx); ok {
+		return content, nil
+	}
+	return "", newError("failed to get users")
 }
 
 type handlerServer struct {
@@ -121,6 +142,29 @@ func (s *handlerServer) AlterInbound(ctx context.Context, request *AlterInboundR
 	}
 
 	return &AlterInboundResponse{}, operation.ApplyInbound(ctx, handler)
+}
+
+func (s *handlerServer) QueryInbound(ctx context.Context, request *QueryInboundRequest) (*QueryInboundResponse, error) {
+	rawOperation, err := request.Operation.GetInstance()
+	if err != nil {
+		return nil, newError("unknown operation").Base(err)
+	}
+	operation, ok := rawOperation.(InboundQueryOperation)
+	if !ok {
+		return nil, newError("not an inbound operation")
+	}
+
+	handler, err := s.ihm.GetHandler(ctx, request.Tag)
+	if err != nil {
+		return nil, newError("failed to get handler: ", request.Tag).Base(err)
+	}
+
+	resp, err := operation.QueryInbound(ctx, handler)
+	if err != nil {
+		return nil, err
+	}
+
+	return &QueryInboundResponse{Content: resp}, nil
 }
 
 func (s *handlerServer) GetAllOutbounds(ctx context.Context, request *GetAllOutboundsRequest) (*GetAllOutboundsResponse, error) {

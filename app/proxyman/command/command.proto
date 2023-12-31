@@ -10,6 +10,8 @@ import "common/protocol/user.proto";
 import "common/serial/typed_message.proto";
 import "core/config.proto";
 
+message GetUsersOperation{}
+
 message AddUserOperation {
   xray.common.protocol.User user = 1;
 }
@@ -42,6 +44,15 @@ message AlterInboundRequest {
 }
 
 message AlterInboundResponse {}
+
+message QueryInboundRequest {
+  string tag = 1;
+  xray.common.serial.TypedMessage operation = 2;
+}
+
+message QueryInboundResponse {
+  string content = 1;
+}
 
 message GetAllOutboundsRequest {}
 
@@ -76,6 +87,8 @@ service HandlerService {
   rpc RemoveInbound(RemoveInboundRequest) returns (RemoveInboundResponse) {}
 
   rpc AlterInbound(AlterInboundRequest) returns (AlterInboundResponse) {}
+
+  rpc QueryInbound(QueryInboundRequest) returns (QueryInboundResponse) {}
 
   rpc GetAllOutbounds(GetAllOutboundsRequest) returns (GetAllOutboundsResponse) {}
 

@@ -23,5 +23,8 @@ var CmdAPI = &base.Command{
 		cmdRemoveOutbounds,
 		cmdGetRoutingConfig,
 		cmdSetRoutingConfig,
+		cmdGetUsers,
+		cmdAddUsers,
+		cmdRemoveUsers,
 	},
 }
