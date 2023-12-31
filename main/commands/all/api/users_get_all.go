@@ -45,5 +45,5 @@ func executeGetUsers(cmd *base.Command, args []string) {
 	if err != nil {
 		base.Fatalf("%s\n", err)
 	}
-	fmt.Println(resp.Content)
+	fmt.Print(resp.Content)
 }
