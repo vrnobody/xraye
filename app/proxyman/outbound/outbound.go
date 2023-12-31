@@ -4,6 +4,7 @@ package outbound
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"sync"
 
@@ -142,17 +143,34 @@ func (m *Manager) GetAllHandlers(ctx context.Context) ([]outbound.Handler, error
 
 // RemoveHandler implements outbound.Manager.
 func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
-	if tag == "" {
-		return common.ErrNoClue
-	}
 	m.access.Lock()
 	defer m.access.Unlock()
 
-	delete(m.taggedHandler, tag)
-	if m.defaultHandler != nil && m.defaultHandler.Tag() == tag {
+	var handler outbound.Handler
+	switch t := proxyman.ParseTag(tag).(type) {
+	case int:
+		if t >= 0 && t < len(m.untaggedHandlers) {
+			handler = m.untaggedHandlers[t]
+			m.untaggedHandlers = slices.Delete(m.untaggedHandlers, t, t+1)
+		} else {
+			err := newError("handler #", t, ", index out of range").AtWarning()
+			err.WriteToLog()
+			return err
+		}
+	case string:
+		if h, ok := m.taggedHandler[t]; ok {
+			handler = h
+		} else {
+			// do not return error here
+			// app/commander/commander.go Start() will call RemoveHandler("api") and expceting nil return value.
+		}
+		delete(m.taggedHandler, t)
+	case *errors.Error:
+		return t
+	}
+	if handler != nil && handler == m.defaultHandler {
 		m.defaultHandler = nil
 	}
-
 	return nil
 }
 
