@@ -18,6 +18,8 @@ message RemoveUserOperation {
   string email = 1;
 }
 
+message GetUsersOperation{}
+
 message AddInboundRequest {
   core.InboundHandlerConfig inbound = 1;
 }
@@ -36,6 +38,15 @@ message AlterInboundRequest {
 }
 
 message AlterInboundResponse {}
+
+message QueryInboundRequest {
+  string tag = 1;
+  xray.common.serial.TypedMessage operation = 2;
+}
+
+message QueryInboundResponse {
+  string content = 1;
+}
 
 message AddOutboundRequest {
   core.OutboundHandlerConfig outbound = 1;
@@ -62,6 +73,8 @@ service HandlerService {
   rpc RemoveInbound(RemoveInboundRequest) returns (RemoveInboundResponse) {}
 
   rpc AlterInbound(AlterInboundRequest) returns (AlterInboundResponse) {}
+
+  rpc QueryInbound(QueryInboundRequest) returns (QueryInboundResponse) {}
 
   rpc AddOutbound(AddOutboundRequest) returns (AddOutboundResponse) {}
 
