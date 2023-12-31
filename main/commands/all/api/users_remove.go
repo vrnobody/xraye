@@ -15,9 +15,9 @@ import (
 var cmdRemoveUsers = &base.Command{
 	CustomFlags: true,
 	UsageLine:   "{{.Exec}} api rmu [--server=127.0.0.1:8080] <c.json> [c2.json] ...",
-	Short:       "Remove users from inbound",
+	Short:       "Remove users from inbounds",
 	Long: `
-Remove users from inbound.
+Remove users from inbounds.
 Arguments:
 	-s, -server 
 		The API server address. Default 127.0.0.1:8080
