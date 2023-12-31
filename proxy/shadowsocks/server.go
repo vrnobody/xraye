@@ -16,6 +16,7 @@ import (
 	"github.com/xtls/xray-core/core"
 	"github.com/xtls/xray-core/features/policy"
 	"github.com/xtls/xray-core/features/routing"
+	"github.com/xtls/xray-core/proxy"
 	"github.com/xtls/xray-core/transport/internet/stat"
 	"github.com/xtls/xray-core/transport/internet/udp"
 )
@@ -49,7 +50,14 @@ func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
 		cone:          ctx.Value("cone").(bool),
 	}
 
+	var _ proxy.UserManager = s
+
 	return s, nil
+}
+
+// GetUsers implements proxy.UserManager.GetUsers().
+func (s *Server) GetUsers(ctx context.Context) (string, bool) {
+	return "shadowsoks protocol do not support getu command!", true
 }
 
 // AddUser implements proxy.UserManager.AddUser().
@@ -74,7 +82,7 @@ func (s *Server) Process(ctx context.Context, network net.Network, conn stat.Con
 	inbound := session.InboundFromContext(ctx)
 	inbound.Name = "shadowsocks"
 	inbound.SetCanSpliceCopy(3)
-	
+
 	switch network {
 	case net.Network_TCP:
 		return s.handleConnection(ctx, conn, dispatcher)

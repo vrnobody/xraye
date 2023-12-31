@@ -3,6 +3,8 @@ package shadowsocks_2022
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
+
 	"strconv"
 	"strings"
 	"sync"
@@ -24,6 +26,7 @@ import (
 	"github.com/xtls/xray-core/common/singbridge"
 	"github.com/xtls/xray-core/common/uuid"
 	"github.com/xtls/xray-core/features/routing"
+	"github.com/xtls/xray-core/proxy"
 	"github.com/xtls/xray-core/transport/internet/stat"
 )
 
@@ -52,6 +55,8 @@ func NewMultiServer(ctx context.Context, config *MultiUserServerConfig) (*MultiU
 		networks: networks,
 		users:    config.Users,
 	}
+
+	var _ proxy.UserManager = inbound
 	if config.Key == "" {
 		return nil, newError("missing key")
 	}
@@ -80,6 +85,17 @@ func NewMultiServer(ctx context.Context, config *MultiUserServerConfig) (*MultiU
 
 	inbound.service = service
 	return inbound, nil
+}
+
+// GetUsers implements proxy.UserManager.GetUsers().
+func (i *MultiUserInbound) GetUsers(ctx context.Context) (string, bool) {
+	i.Lock()
+	defer i.Unlock()
+
+	if j, err := json.MarshalIndent(i.users, "", "  "); err == nil {
+		return string(j), true
+	}
+	return "", false
 }
 
 // AddUser implements proxy.UserManager.AddUser().

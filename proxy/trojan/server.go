@@ -21,6 +21,7 @@ import (
 	"github.com/xtls/xray-core/core"
 	"github.com/xtls/xray-core/features/policy"
 	"github.com/xtls/xray-core/features/routing"
+	"github.com/xtls/xray-core/proxy"
 	"github.com/xtls/xray-core/transport/internet/reality"
 	"github.com/xtls/xray-core/transport/internet/stat"
 	"github.com/xtls/xray-core/transport/internet/tls"
@@ -61,6 +62,8 @@ func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
 		validator:     validator,
 		cone:          ctx.Value("cone").(bool),
 	}
+
+	var _ proxy.UserManager = server
 
 	if config.Fallbacks != nil {
 		server.fallbacks = make(map[string]map[string]map[string]*Fallback)
@@ -123,6 +126,11 @@ func (s *Server) AddUser(ctx context.Context, u *protocol.MemoryUser) error {
 // RemoveUser implements proxy.UserManager.RemoveUser().
 func (s *Server) RemoveUser(ctx context.Context, e string) error {
 	return s.validator.Del(e)
+}
+
+// GetUsers implements proxy.UserManager.GetUsers().
+func (s *Server) GetUsers(ctx context.Context) (string, bool) {
+	return s.validator.GetAll()
 }
 
 // Network implements proxy.Inbound.Network().
