@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+
 	"io"
 	"net/http"
 	"net/url"
@@ -11,6 +12,17 @@ import (
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/xtls/xray-core/common/protocol"
+
+	"github.com/xtls/xray-core/core"
+
+	"github.com/xtls/xray-core/infra/conf"
+	"github.com/xtls/xray-core/infra/conf/serial"
+
+	trojanin "github.com/xtls/xray-core/proxy/trojan"
+	vlessin "github.com/xtls/xray-core/proxy/vless/inbound"
+	vmessin "github.com/xtls/xray-core/proxy/vmess/inbound"
 
 	"github.com/xtls/xray-core/common/buf"
 	"github.com/xtls/xray-core/main/commands/base"
@@ -130,4 +142,45 @@ func isNil(i interface{}) bool {
 		return vi.IsNil()
 	}
 	return i == nil
+}
+
+func getUsersFromInbound(i *core.InboundHandlerConfig) []*protocol.User {
+	if i == nil {
+		return nil
+	}
+	inst, err := i.ProxySettings.GetInstance()
+	if err != nil || inst == nil {
+		fmt.Println("failed to get inbound instance:", err)
+		return nil
+	}
+	switch ty := inst.(type) {
+	case *vmessin.Config:
+		return ty.User
+	case *vlessin.Config:
+		return ty.Clients
+	case *trojanin.ServerConfig:
+		return ty.Users
+	default:
+		fmt.Println("unsupported inbound type")
+	}
+	return nil
+}
+
+func loadInboundsFromConfigFiles(unnamedArgs []string) []conf.InboundDetourConfig {
+	ins := make([]conf.InboundDetourConfig, 0)
+	for _, arg := range unnamedArgs {
+		r, err := loadArg(arg)
+		if err != nil {
+			base.Fatalf("failed to load %s: %s", arg, err)
+		}
+		conf, err := serial.DecodeJSONConfig(r)
+		if err != nil {
+			base.Fatalf("failed to decode %s: %s", arg, err)
+		}
+		ins = append(ins, conf.InboundConfigs...)
+	}
+	if len(ins) == 0 {
+		base.Fatalf("no valid inbound found")
+	}
+	return ins
 }
