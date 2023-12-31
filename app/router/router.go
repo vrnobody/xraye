@@ -4,8 +4,10 @@ package router
 
 import (
 	"context"
+	"sync"
 
 	"github.com/xtls/xray-core/common"
+	cserial "github.com/xtls/xray-core/common/serial"
 	"github.com/xtls/xray-core/core"
 	"github.com/xtls/xray-core/features/dns"
 	"github.com/xtls/xray-core/features/outbound"
@@ -19,6 +21,10 @@ type Router struct {
 	rules          []*Rule
 	balancers      map[string]*Balancer
 	dns            dns.Client
+	ctx            context.Context
+	ohm            outbound.Manager
+	mu             sync.Mutex
+	config         *Config
 }
 
 // Route is an implementation of routing.Route.
@@ -30,20 +36,47 @@ type Route struct {
 
 // Init initializes the Router.
 func (r *Router) Init(ctx context.Context, config *Config, d dns.Client, ohm outbound.Manager) error {
-	r.domainStrategy = config.DomainStrategy
 	r.dns = d
+	r.ctx = ctx
+	r.ohm = ohm
+	return r.Reload(config)
+}
 
-	r.balancers = make(map[string]*Balancer, len(config.BalancingRule))
+func (r *Router) GetRoutingConfig() (*cserial.TypedMessage, error) {
+	tmsg := cserial.ToTypedMessage(r.config)
+	if tmsg == nil {
+		return nil, newError("config is null")
+	}
+	return tmsg, nil
+}
+
+func (r *Router) SetRoutingConfig(config *cserial.TypedMessage) error {
+	inst, err := config.GetInstance()
+	if err != nil {
+		return err
+	}
+	if c, ok := inst.(*Config); ok {
+		r.Reload(c)
+		return nil
+	}
+	return newError("config type error")
+}
+
+func (r *Router) Reload(config *Config) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	balancers := make(map[string]*Balancer, len(config.BalancingRule))
 	for _, rule := range config.BalancingRule {
-		balancer, err := rule.Build(ohm)
+		balancer, err := rule.Build(r.ohm)
 		if err != nil {
 			return err
 		}
-		balancer.InjectContext(ctx)
-		r.balancers[rule.Tag] = balancer
+		balancer.InjectContext(r.ctx)
+		balancers[rule.Tag] = balancer
 	}
 
-	r.rules = make([]*Rule, 0, len(config.Rule))
+	rules := make([]*Rule, 0, len(config.Rule))
 	for _, rule := range config.Rule {
 		cond, err := rule.BuildCondition()
 		if err != nil {
@@ -55,15 +88,19 @@ func (r *Router) Init(ctx context.Context, config *Config, d dns.Client, ohm out
 		}
 		btag := rule.GetBalancingTag()
 		if len(btag) > 0 {
-			brule, found := r.balancers[btag]
+			brule, found := balancers[btag]
 			if !found {
 				return newError("balancer ", btag, " not found")
 			}
 			rr.Balancer = brule
 		}
-		r.rules = append(r.rules, rr)
+		rules = append(rules, rr)
 	}
 
+	r.domainStrategy = config.DomainStrategy
+	r.balancers = balancers
+	r.rules = rules
+	r.config = config
 	return nil
 }
 
@@ -140,6 +177,7 @@ func (r *Route) GetOutboundTag() string {
 func init() {
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		r := new(Router)
+		var _ routing.Router = r
 		if err := core.RequireFeatures(ctx, func(d dns.Client, ohm outbound.Manager) error {
 			return r.Init(ctx, config.(*Config), d, ohm)
 		}); err != nil {

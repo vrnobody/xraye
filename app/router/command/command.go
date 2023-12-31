@@ -27,6 +27,23 @@ func NewRoutingServer(router routing.Router, routingStats stats.Channel) Routing
 	}
 }
 
+func (s *routingServer) GetRoutingConfig(ctx context.Context, request *GetRoutingConfigRequest) (*GetRoutingConfigResponse, error) {
+	config, err := s.router.GetRoutingConfig()
+	if err != nil {
+		return nil, err
+	}
+	return &GetRoutingConfigResponse{
+		Config: config,
+	}, nil
+}
+
+func (s *routingServer) SetRoutingConfig(ctx context.Context, request *SetRoutingConfigRequest) (*SetRoutingConfigResponse, error) {
+	if err := s.router.SetRoutingConfig(request.Config); err != nil {
+		return nil, err
+	}
+	return &SetRoutingConfigResponse{}, nil
+}
+
 func (s *routingServer) TestRoute(ctx context.Context, request *TestRouteRequest) (*RoutingContext, error) {
 	if request.RoutingContext == nil {
 		return nil, newError("Invalid routing request.")

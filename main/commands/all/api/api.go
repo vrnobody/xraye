@@ -21,5 +21,7 @@ var CmdAPI = &base.Command{
 		cmdAddOutbounds,
 		cmdRemoveInbounds,
 		cmdRemoveOutbounds,
+		cmdGetRoutingConfig,
+		cmdSetRoutingConfig,
 	},
 }
