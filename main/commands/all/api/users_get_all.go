@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"strings"
 
 	handlerService "github.com/xtls/xray-core/app/proxyman/command"
 	cserial "github.com/xtls/xray-core/common/serial"
@@ -44,6 +45,7 @@ func executeGetUsers(cmd *base.Command, args []string) {
 
 	if err != nil {
 		base.Fatalf("%s\n", err)
+	} else {
+		fmt.Printf("[%s]", strings.Join(resp.Content, ",\n"))
 	}
-	fmt.Print(resp.Content)
 }
