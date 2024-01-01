@@ -44,6 +44,19 @@ func marshalSlice(v reflect.Value, ignoreNullValue bool) interface{} {
 	return r
 }
 
+func isNullValue(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+	kind := reflect.TypeOf(v).Kind()
+	switch kind {
+	case reflect.Slice, reflect.Array, reflect.Map, reflect.Struct:
+		return reflect.ValueOf(v).Len() == 0
+	default:
+		return false
+	}
+}
+
 func marshalStruct(v reflect.Value, ignoreNullValue bool) interface{} {
 	r := make(map[string]interface{})
 	t := v.Type()
@@ -54,7 +67,7 @@ func marshalStruct(v reflect.Value, ignoreNullValue bool) interface{} {
 			name := ft.Name
 			value := rv.Interface()
 			tv := marshalInterface(value, ignoreNullValue)
-			if tv != nil || !ignoreNullValue {
+			if !ignoreNullValue || !isNullValue(tv) {
 				r[name] = tv
 			}
 		}
