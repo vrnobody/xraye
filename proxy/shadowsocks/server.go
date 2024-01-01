@@ -57,7 +57,7 @@ func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
 
 // GetUsers implements proxy.UserManager.GetUsers().
 func (s *Server) GetUsers(ctx context.Context) ([]string, bool) {
-	return []string{"shadowsoks protocol do not support getu command!"}, false
+	return s.validator.GetAll()
 }
 
 // AddUser implements proxy.UserManager.AddUser().

@@ -4,6 +4,7 @@ import (
 	"crypto/cipher"
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/json"
 	"hash/crc64"
 	"strings"
 	"sync"
@@ -41,6 +42,45 @@ func (v *Validator) Add(u *protocol.MemoryUser) error {
 	}
 
 	return nil
+}
+
+var jsonCache sync.Map
+
+// GetAll users info.
+func (v *Validator) GetAll() ([]string, bool) {
+	type info struct {
+		Password string
+		Email    string
+		Level    uint32
+	}
+
+	users := make([]string, 0)
+	for _, mu := range v.users {
+		if o, ok := jsonCache.Load(mu); ok {
+			if o == nil {
+				continue
+			}
+			if user, ok := o.(string); ok {
+				users = append(users, user)
+				continue
+			}
+		}
+		if ma, ok := mu.Account.(*MemoryAccount); ok {
+			info := &info{
+				Password: ma.Password,
+				Email:    mu.Email,
+				Level:    mu.Level,
+			}
+			if j, err := json.MarshalIndent(info, "", "  "); err == nil {
+				user := string(j)
+				users = append(users, user)
+				jsonCache.Store(mu, user)
+				continue
+			}
+		}
+		jsonCache.Store(mu, nil)
+	}
+	return users, true
 }
 
 // Del a Shadowsocks user with a non-empty Email.
