@@ -37,8 +37,10 @@ func (v *Validator) Del(e string) error {
 	if u == nil {
 		return newError("User ", e, " not found.")
 	}
+	mu := u.(*protocol.MemoryUser)
+	jsonCache.Delete(mu)
 	v.email.Delete(le)
-	v.users.Delete(hexString(u.(*protocol.MemoryUser).Account.(*MemoryAccount).Key))
+	v.users.Delete(hexString(mu.Account.(*MemoryAccount).Key))
 	return nil
 }
 
@@ -51,34 +53,46 @@ func (v *Validator) Get(hash string) *protocol.MemoryUser {
 	return nil
 }
 
+var jsonCache sync.Map
+
 // GetAll users info.
-func (v *Validator) GetAll() (string, bool) {
+func (v *Validator) GetAll() ([]string, bool) {
 	type info struct {
 		Password string
 		Email    string
 		Level    uint32
 	}
 
-	// i know this approach is slow, PR is welcome
-	users := make([]*info, 0)
-
+	users := make([]string, 0)
 	v.users.Range(func(_, value interface{}) bool {
-		if mu, ok := value.(*protocol.MemoryUser); ok {
-			if ma, ok := mu.Account.(*MemoryAccount); ok {
-				user := &info{
-					Password: ma.Password,
-					Email:    mu.Email,
-					Level:    mu.Level,
-				}
-				users = append(users, user)
-			}
-
+		mu, ok := value.(*protocol.MemoryUser)
+		if !ok {
+			return true
 		}
+		if o, ok := jsonCache.Load(mu); ok {
+			if o == nil {
+				return true
+			}
+			if user, ok := o.(string); ok {
+				users = append(users, user)
+				return true
+			}
+		}
+		if ma, ok := mu.Account.(*MemoryAccount); ok {
+			info := &info{
+				Password: ma.Password,
+				Email:    mu.Email,
+				Level:    mu.Level,
+			}
+			if j, err := json.MarshalIndent(info, "", "  "); err == nil {
+				user := string(j)
+				users = append(users, user)
+				jsonCache.Store(mu, user)
+				return true
+			}
+		}
+		jsonCache.Store(mu, nil)
 		return true
 	})
-
-	if j, err := json.MarshalIndent(users, "", "  "); err == nil {
-		return string(j), true
-	}
-	return "", false
+	return users, true
 }

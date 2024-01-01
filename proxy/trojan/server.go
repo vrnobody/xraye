@@ -129,7 +129,7 @@ func (s *Server) RemoveUser(ctx context.Context, e string) error {
 }
 
 // GetUsers implements proxy.UserManager.GetUsers().
-func (s *Server) GetUsers(ctx context.Context) (string, bool) {
+func (s *Server) GetUsers(ctx context.Context) ([]string, bool) {
 	return s.validator.GetAll()
 }
 
