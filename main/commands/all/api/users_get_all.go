@@ -21,7 +21,7 @@ Arguments:
 	-t, -timeout
 		Timeout seconds to call API. Default 3
 Example:
-    {{.Exec}} {{.LongName}} --server=127.0.0.1:8080 "vmessin"
+    {{.Exec}} {{.LongName}} --server=127.0.0.1:8080 "vmess-in"
 `,
 	Run: executeGetUsers,
 }
@@ -30,8 +30,8 @@ func executeGetUsers(cmd *base.Command, args []string) {
 	setSharedFlags(cmd)
 	cmd.Flag.Parse(args)
 	unnamedArgs := cmd.Flag.Args()
-	if len(unnamedArgs) < 1 {
-		base.Fatalf("please provide an inbound tag")
+	if len(unnamedArgs) != 1 {
+		base.Fatalf("accept only one inbound tag")
 	}
 	tag := unnamedArgs[0]
 	conn, ctx, close := dialAPIServer()
