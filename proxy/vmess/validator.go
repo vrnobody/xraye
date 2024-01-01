@@ -34,8 +34,10 @@ func NewTimedUserValidator() *TimedUserValidator {
 	return tuv
 }
 
+var jsonCache sync.Map
+
 // GetAll users info.
-func (v *TimedUserValidator) GetAll() (string, bool) {
+func (v *TimedUserValidator) GetAll() ([]string, bool) {
 	v.Lock()
 	defer v.Unlock()
 
@@ -46,24 +48,34 @@ func (v *TimedUserValidator) GetAll() (string, bool) {
 		Level    uint32
 	}
 
-	// i know this approach is slow, PR is welcome
-	users := make([]*info, 0)
+	users := make([]string, 0)
 	for _, mu := range v.users {
+		if o, ok := jsonCache.Load(mu); ok {
+			if o == nil {
+				continue
+			}
+			if user, ok := o.(string); ok {
+				users = append(users, user)
+				continue
+			}
+		}
 		if ma, ok := mu.Account.(*MemoryAccount); ok {
-			user := &info{
+			info := &info{
 				Id:       ma.ID.String(),
 				Security: ma.Security.String(),
 				Email:    mu.Email,
 				Level:    mu.Level,
 			}
-			users = append(users, user)
+			if j, err := json.MarshalIndent(info, "", "  "); err == nil {
+				user := string(j)
+				users = append(users, user)
+				jsonCache.Store(mu, user)
+				continue
+			}
 		}
+		jsonCache.Store(mu, nil)
 	}
-
-	if j, err := json.MarshalIndent(users, "", "  "); err == nil {
-		return string(j), true
-	}
-	return "", false
+	return users, true
 }
 
 func (v *TimedUserValidator) Add(u *protocol.MemoryUser) error {
@@ -118,8 +130,9 @@ func (v *TimedUserValidator) Remove(email string) bool {
 	if idx == -1 {
 		return false
 	}
-	ulen := len(v.users)
 
+	jsonCache.Delete(v.users[idx])
+	ulen := len(v.users)
 	v.users[idx] = v.users[ulen-1]
 	v.users[ulen-1] = nil
 	v.users = v.users[:ulen-1]

@@ -154,7 +154,7 @@ func (h *Handler) GetUser(email string) *protocol.MemoryUser {
 	return user
 }
 
-func (h *Handler) GetUsers(ctx context.Context) (string, bool) {
+func (h *Handler) GetUsers(ctx context.Context) ([]string, bool) {
 	return h.clients.GetAll()
 }
 

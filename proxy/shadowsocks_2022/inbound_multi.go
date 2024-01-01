@@ -87,15 +87,32 @@ func NewMultiServer(ctx context.Context, config *MultiUserServerConfig) (*MultiU
 	return inbound, nil
 }
 
+var jsonCache sync.Map
+
 // GetUsers implements proxy.UserManager.GetUsers().
-func (i *MultiUserInbound) GetUsers(ctx context.Context) (string, bool) {
+func (i *MultiUserInbound) GetUsers(ctx context.Context) ([]string, bool) {
 	i.Lock()
 	defer i.Unlock()
 
-	if j, err := json.MarshalIndent(i.users, "", "  "); err == nil {
-		return string(j), true
+	users := make([]string, 0)
+	for _, user := range i.users {
+		if j, ok := jsonCache.Load(user); ok {
+			if j != nil {
+				if u, ok := j.(string); ok {
+					users = append(users, u)
+				}
+			}
+			continue
+		}
+		if j, err := json.MarshalIndent(user, "", "  "); err == nil {
+			u := string(j)
+			users = append(users, u)
+			jsonCache.Store(user, u)
+			continue
+		}
+		jsonCache.Store(user, nil)
 	}
-	return "", false
+	return users, false
 }
 
 // AddUser implements proxy.UserManager.AddUser().
@@ -148,8 +165,8 @@ func (i *MultiUserInbound) RemoveUser(ctx context.Context, email string) error {
 		return newError("User ", email, " not found.")
 	}
 
+	jsonCache.Delete(i.users[idx])
 	ulen := len(i.users)
-
 	i.users[idx] = i.users[ulen-1]
 	i.users[ulen-1] = nil
 	i.users = i.users[:ulen-1]
