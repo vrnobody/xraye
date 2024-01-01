@@ -26,7 +26,7 @@ type OutboundOperation interface {
 // InboundQueryOperation is the interface for query operations that applies to inbound handlers.
 type InboundQueryOperation interface {
 	// ApplyInbound applies this operation to the given inbound handler.
-	QueryInbound(context.Context, inbound.Handler) (string, error)
+	QueryInbound(context.Context, inbound.Handler) ([]string, error)
 }
 
 func getInbound(handler inbound.Handler) (proxy.Inbound, error) {
@@ -67,19 +67,19 @@ func (op *RemoveUserOperation) ApplyInbound(ctx context.Context, handler inbound
 	return um.RemoveUser(ctx, op.Email)
 }
 
-func (op *GetUsersOperation) QueryInbound(ctx context.Context, handler inbound.Handler) (string, error) {
+func (op *GetUsersOperation) QueryInbound(ctx context.Context, handler inbound.Handler) ([]string, error) {
 	p, err := getInbound(handler)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	um, ok := p.(proxy.UserManager)
 	if !ok {
-		return "", newError("proxy is not a UserManager")
+		return nil, newError("proxy is not a UserManager")
 	}
 	if content, ok := um.GetUsers(ctx); ok {
 		return content, nil
 	}
-	return "", newError("failed to get users")
+	return nil, newError("failed to get users")
 }
 
 type handlerServer struct {

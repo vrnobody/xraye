@@ -45,7 +45,7 @@ message QueryInboundRequest {
 }
 
 message QueryInboundResponse {
-  string content = 1;
+  repeated string content = 1;
 }
 
 message AddOutboundRequest {
