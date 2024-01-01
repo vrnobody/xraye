@@ -1,7 +1,6 @@
 package conf
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/xtls/xray-core/app/commander"
@@ -37,7 +36,6 @@ func (c *APIConfig) Build() (*commander.Config, error) {
 		case "observatoryservice":
 			services = append(services, serial.ToTypedMessage(&observatoryservice.Config{}))
 		case "routingservice":
-			fmt.Println("load routing service")
 			services = append(services, serial.ToTypedMessage(&routingservice.Config{}))
 		}
 	}
