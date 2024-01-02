@@ -162,7 +162,7 @@ func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
 			handler = h
 		} else {
 			// do not return error here
-			// app/commander/commander.go Start() will call RemoveHandler("api") and expceting nil return value.
+			// app/commander/commander.go Start() will call RemoveHandler("api") and expceting nil.
 		}
 		delete(m.taggedHandler, t)
 	case *errors.Error:

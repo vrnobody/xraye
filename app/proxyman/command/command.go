@@ -190,12 +190,33 @@ func (s *handlerServer) AddOutbound(ctx context.Context, request *AddOutboundReq
 }
 
 func (s *handlerServer) RemoveOutbound(ctx context.Context, request *RemoveOutboundRequest) (*RemoveOutboundResponse, error) {
-	h := s.ohm.GetHandler(request.Tag)
+	tag := request.Tag
+	resp := &RemoveOutboundResponse{}
+	if tag == "*" {
+		// make sure do not delete the api outbound
+		if hs, err := s.ohm.GetAllHandlers(ctx); err == nil {
+			for _, h := range hs {
+				if t := h.Tag(); t != "" {
+					if _, ok := configCache.LoadAndDelete(h); ok {
+						if err := s.ohm.RemoveHandler(ctx, t); err != nil {
+							return nil, err
+						}
+					}
+				}
+			}
+			newError("all tagged outbounds are removed from config cache").AtDebug().WriteToLog()
+		} else {
+			return nil, err
+		}
+		return resp, nil
+	}
+
+	h := s.ohm.GetHandler(tag)
 	if _, ok := configCache.LoadAndDelete(h); ok {
 		ht := reflect.TypeOf(h)
 		newError("remove ", ht, " from config cache").AtDebug().WriteToLog()
 	}
-	return &RemoveOutboundResponse{}, s.ohm.RemoveHandler(ctx, request.Tag)
+	return resp, s.ohm.RemoveHandler(ctx, tag)
 }
 
 func (s *handlerServer) AlterOutbound(ctx context.Context, request *AlterOutboundRequest) (*AlterOutboundResponse, error) {
