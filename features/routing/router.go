@@ -43,13 +43,24 @@ func RouterType() interface{} {
 type DefaultRouter struct{}
 
 // Type implements common.HasType.
-func (DefaultRouter) Type() interface{} {
+func (dr DefaultRouter) Type() interface{} {
+	var _ Router = dr
 	return RouterType()
 }
 
 // PickRoute implements Router.
 func (DefaultRouter) PickRoute(ctx Context) (Route, error) {
 	return nil, common.ErrNoClue
+}
+
+// GetRoutingConfig implements Router.
+func (DefaultRouter) GetRoutingConfig() (*cserial.TypedMessage, error) {
+	return nil, common.ErrNoClue
+}
+
+// SetRoutingConfig implements Router.
+func (DefaultRouter) SetRoutingConfig(*cserial.TypedMessage) error {
+	return common.ErrNoClue
 }
 
 // Start implements common.Runnable.

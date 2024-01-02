@@ -28,6 +28,7 @@ func New(ctx context.Context, config *proxyman.InboundConfig) (*Manager, error) 
 	m := &Manager{
 		taggedHandlers: make(map[string]inbound.Handler),
 	}
+	var _ inbound.Manager = m
 	return m, nil
 }
 
