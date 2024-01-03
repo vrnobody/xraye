@@ -34,6 +34,168 @@ import (
 	"google.golang.org/grpc"
 )
 
+func TestProxymanGetAddRemoveInboundUsers(t *testing.T) {
+	tcpServer := tcp.Server{
+		MsgProcessor: xor,
+	}
+	dest, err := tcpServer.Start()
+	common.Must(err)
+	defer tcpServer.Close()
+
+	cmdPort := tcp.PickPort()
+	userID := protocol.NewID(uuid.New()).String()
+	userEmail := "love@v2ray.com"
+	vmessTag := "vmess"
+
+	config := &core.Config{
+		App: []*serial.TypedMessage{
+			serial.ToTypedMessage(&commander.Config{
+				Tag: "api",
+				Service: []*serial.TypedMessage{
+					serial.ToTypedMessage(&command.Config{}),
+				},
+			}),
+			serial.ToTypedMessage(&router.Config{
+				Rule: []*router.RoutingRule{
+					{
+						InboundTag: []string{"api"},
+						TargetTag: &router.RoutingRule_Tag{
+							Tag: "api",
+						},
+					},
+				},
+			}),
+		},
+		Inbound: []*core.InboundHandlerConfig{
+			{
+				Tag: "api",
+				ReceiverSettings: serial.ToTypedMessage(&proxyman.ReceiverConfig{
+					PortList: &net.PortList{Range: []*net.PortRange{net.SinglePortRange(cmdPort)}},
+					Listen:   net.NewIPOrDomain(net.LocalHostIP),
+				}),
+				ProxySettings: serial.ToTypedMessage(&dokodemo.Config{
+					Address:  net.NewIPOrDomain(dest.Address),
+					Port:     uint32(dest.Port),
+					Networks: []net.Network{net.Network_TCP},
+				}),
+			},
+			{
+				Tag: vmessTag,
+				ReceiverSettings: serial.ToTypedMessage(&proxyman.ReceiverConfig{
+					PortList: &net.PortList{Range: []*net.PortRange{net.SinglePortRange(tcp.PickPort())}},
+					Listen:   net.NewIPOrDomain(net.LocalHostIP),
+				}),
+				ProxySettings: serial.ToTypedMessage(&inbound.Config{
+					User: []*protocol.User{
+						{
+							Account: serial.ToTypedMessage(&vmess.Account{
+								Id: userID,
+							}),
+							Email: userEmail,
+						},
+					},
+				}),
+			},
+		},
+		Outbound: []*core.OutboundHandlerConfig{
+			{
+				Tag:           "default-outbound",
+				ProxySettings: serial.ToTypedMessage(&freedom.Config{}),
+			},
+		},
+	}
+
+	servers, err := InitializeServerConfigs(config)
+	common.Must(err)
+	defer CloseAllServers(servers)
+
+	cmdConn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", cmdPort), grpc.WithInsecure(), grpc.WithBlock())
+	common.Must(err)
+	defer cmdConn.Close()
+
+	ctx := context.Background()
+	hsClient := command.NewHandlerServiceClient(cmdConn)
+
+	// get user
+	getResp, err := hsClient.QueryInbound(ctx, &command.QueryInboundRequest{
+		Tag:       vmessTag,
+		Operation: serial.ToTypedMessage(&command.GetUsersOperation{}),
+	})
+	common.Must(err)
+	if getResp == nil || len(getResp.Content) != 1 {
+		t.Error("unexpected nil response")
+	}
+
+	// add user
+	user2ID := protocol.NewID(uuid.New()).String()
+	user2Email := "user2@v2ray.com"
+	addResp, err := hsClient.AlterInbound(ctx, &command.AlterInboundRequest{
+		Tag: vmessTag,
+		Operation: serial.ToTypedMessage(&command.AddUserOperation{
+			User: &protocol.User{
+				Account: serial.ToTypedMessage(&vmess.Account{
+					Id: user2ID,
+				}),
+				Email: user2Email,
+			},
+		}),
+	})
+	common.Must(err)
+	if addResp == nil {
+		t.Error("unexpected nil response")
+	}
+
+	// get user
+	getResp, err = hsClient.QueryInbound(ctx, &command.QueryInboundRequest{
+		Tag:       vmessTag,
+		Operation: serial.ToTypedMessage(&command.GetUsersOperation{}),
+	})
+	common.Must(err)
+	if getResp == nil || len(getResp.Content) != 2 {
+		t.Error("unexpected nil response")
+	}
+	if !checkSubstrings(getResp.Content[0], userID, userEmail) {
+		t.Error("unexpected user information")
+	}
+	if !checkSubstrings(getResp.Content[1], user2ID, user2Email) {
+		t.Error("unexpected user2 information")
+	}
+
+	// remove user
+	rmResp, err := hsClient.AlterInbound(ctx, &command.AlterInboundRequest{
+		Tag: vmessTag,
+		Operation: serial.ToTypedMessage(&command.RemoveUserOperation{
+			Email: userEmail,
+		}),
+	})
+	common.Must(err)
+	if rmResp == nil {
+		t.Error("unexpected nil response")
+	}
+
+	// get user
+	getResp, err = hsClient.QueryInbound(ctx, &command.QueryInboundRequest{
+		Tag:       vmessTag,
+		Operation: serial.ToTypedMessage(&command.GetUsersOperation{}),
+	})
+	common.Must(err)
+	if getResp == nil || len(getResp.Content) != 1 {
+		t.Error("unexpected nil response")
+	}
+	if !checkSubstrings(getResp.Content[0], user2ID, user2Email) {
+		t.Error("unexpected user2 information")
+	}
+}
+
+func checkSubstrings(str string, subs ...string) bool {
+	for _, sub := range subs {
+		if !strings.Contains(str, sub) {
+			return false
+		}
+	}
+	return true
+}
+
 func TestRouterGetSetRouting(t *testing.T) {
 	tcpServer := tcp.Server{
 		MsgProcessor: xor,
