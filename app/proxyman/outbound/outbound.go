@@ -94,8 +94,15 @@ func (m *Manager) GetDefaultHandler() outbound.Handler {
 func (m *Manager) GetHandler(tag string) outbound.Handler {
 	m.access.RLock()
 	defer m.access.RUnlock()
-	if handler, found := m.taggedHandler[tag]; found {
-		return handler
+	switch t := proxyman.ParseTag(tag).(type) {
+	case int:
+		if t >= 0 && t < len(m.untaggedHandlers) {
+			return m.untaggedHandlers[t]
+		}
+	case string:
+		if h, ok := m.taggedHandler[t]; ok {
+			return h
+		}
 	}
 	return nil
 }
