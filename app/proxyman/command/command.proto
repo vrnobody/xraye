@@ -23,7 +23,7 @@ message RemoveUserOperation {
 message GetAllInboundsRequest {}
 
 message GetAllInboundsResponse {
-  repeated xray.common.serial.TypedMessage configs = 1;
+  repeated xray.core.InboundHandlerConfig configs = 1;
 }
 
 message AddInboundRequest {
@@ -57,7 +57,7 @@ message QueryInboundResponse {
 message GetAllOutboundsRequest {}
 
 message GetAllOutboundsResponse {
-  repeated xray.common.serial.TypedMessage configs = 1;
+  repeated xray.core.OutboundHandlerConfig configs = 1;
 }
 
 message AddOutboundRequest {

@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/xtls/xray-core/common"
-	cserial "github.com/xtls/xray-core/common/serial"
 	"github.com/xtls/xray-core/core"
 
 	"github.com/xtls/xray-core/features/inbound"
@@ -94,14 +93,13 @@ type handlerServer struct {
 }
 
 func (s *handlerServer) GetAllInbounds(ctx context.Context, request *GetAllInboundsRequest) (*GetAllInboundsResponse, error) {
-	configs := make([]*cserial.TypedMessage, 0)
-	if hs, err := s.ihm.GetAllHandlers(ctx); err == nil {
-		for _, h := range hs {
-			if v, ok := configCache.Load(h); ok && v != nil {
-				configs = append(configs, v.(*cserial.TypedMessage))
-			}
+	configs := make([]*core.InboundHandlerConfig, 0)
+	inboundConfigCache.Range(func(_ interface{}, config interface{}) bool {
+		if c, ok := config.(*core.InboundHandlerConfig); ok {
+			configs = append(configs, c)
 		}
-	}
+		return true
+	})
 	return &GetAllInboundsResponse{
 		Configs: configs,
 	}, nil
@@ -109,16 +107,17 @@ func (s *handlerServer) GetAllInbounds(ctx context.Context, request *GetAllInbou
 
 func (s *handlerServer) AddInbound(ctx context.Context, request *AddInboundRequest) (*AddInboundResponse, error) {
 	if err := core.AddInboundHandler(s.s, request.Inbound); err != nil {
-		cleanupConfigCache(ctx, s)
+		if hs, err := s.ihm.GetAllHandlers(ctx); err == nil {
+			cleanupInboundConfigCache(hs)
+		}
 		return nil, err
 	}
-
 	return &AddInboundResponse{}, nil
 }
 
 func (s *handlerServer) RemoveInbound(ctx context.Context, request *RemoveInboundRequest) (*RemoveInboundResponse, error) {
 	if h, err := s.ihm.GetHandler(ctx, request.Tag); err == nil {
-		if _, ok := configCache.LoadAndDelete(h); ok {
+		if _, ok := inboundConfigCache.LoadAndDelete(h); ok {
 			ht := reflect.TypeOf(h)
 			newError("remove ", ht, " from cache").AtDebug().WriteToLog()
 		}
@@ -168,14 +167,13 @@ func (s *handlerServer) QueryInbound(ctx context.Context, request *QueryInboundR
 }
 
 func (s *handlerServer) GetAllOutbounds(ctx context.Context, request *GetAllOutboundsRequest) (*GetAllOutboundsResponse, error) {
-	configs := make([]*cserial.TypedMessage, 0)
-	if hs, err := s.ohm.GetAllHandlers(ctx); err == nil {
-		for _, h := range hs {
-			if v, ok := configCache.Load(h); ok && v != nil {
-				configs = append(configs, v.(*cserial.TypedMessage))
-			}
+	configs := make([]*core.OutboundHandlerConfig, 0)
+	outboundConfigCache.Range(func(_ interface{}, config interface{}) bool {
+		if c, ok := config.(*core.OutboundHandlerConfig); ok {
+			configs = append(configs, c)
 		}
-	}
+		return true
+	})
 	return &GetAllOutboundsResponse{
 		Configs: configs,
 	}, nil
@@ -183,7 +181,9 @@ func (s *handlerServer) GetAllOutbounds(ctx context.Context, request *GetAllOutb
 
 func (s *handlerServer) AddOutbound(ctx context.Context, request *AddOutboundRequest) (*AddOutboundResponse, error) {
 	if err := core.AddOutboundHandler(s.s, request.Outbound); err != nil {
-		cleanupConfigCache(ctx, s)
+		if hs, err := s.ohm.GetAllHandlers(ctx); err == nil {
+			cleanupOutboundConfigCache(hs)
+		}
 		return nil, err
 	}
 	return &AddOutboundResponse{}, nil
@@ -197,7 +197,7 @@ func (s *handlerServer) RemoveOutbound(ctx context.Context, request *RemoveOutbo
 		if hs, err := s.ohm.GetAllHandlers(ctx); err == nil {
 			for _, h := range hs {
 				if t := h.Tag(); t != "" {
-					if _, ok := configCache.LoadAndDelete(h); ok {
+					if _, ok := outboundConfigCache.LoadAndDelete(h); ok {
 						if err := s.ohm.RemoveHandler(ctx, t); err != nil {
 							return nil, err
 						}
@@ -212,7 +212,7 @@ func (s *handlerServer) RemoveOutbound(ctx context.Context, request *RemoveOutbo
 	}
 
 	h := s.ohm.GetHandler(tag)
-	if _, ok := configCache.LoadAndDelete(h); ok {
+	if _, ok := outboundConfigCache.LoadAndDelete(h); ok {
 		ht := reflect.TypeOf(h)
 		newError("remove ", ht, " from config cache").AtDebug().WriteToLog()
 	}
@@ -255,25 +255,32 @@ func (s *service) Register(server *grpc.Server) {
 	server.RegisterService(&vCoreDesc, hs)
 }
 
-var configCache sync.Map
+var inboundConfigCache sync.Map
+var outboundConfigCache sync.Map
 
-// cleanupConfigCach remove handlers failed to add to inbound or outbound manager
-func cleanupConfigCache(ctx context.Context, s *handlerServer) {
-
-	hs := make([]interface{}, 0)
-	if ihs, err := s.ihm.GetAllHandlers(ctx); err == nil {
-		for _, h := range ihs {
-			hs = append(hs, h)
-		}
-	}
-	if ohs, err := s.ohm.GetAllHandlers(ctx); err == nil {
-		for _, h := range ohs {
-			hs = append(hs, h)
-		}
-	}
-
+// cleanupInboundConfigCache remove handlers not in inbound manager
+func cleanupInboundConfigCache(hs []inbound.Handler) {
 	rm := make([]interface{}, 0)
-	configCache.Range(func(key interface{}, _ interface{}) bool {
+	inboundConfigCache.Range(func(key interface{}, _ interface{}) bool {
+		for _, h := range hs {
+			if h == key {
+				return true
+			}
+		}
+		kt := reflect.TypeOf(key)
+		newError("remove ", kt, " from cache").AtDebug().WriteToLog()
+		rm = append(rm, key)
+		return true
+	})
+	for _, h := range rm {
+		inboundConfigCache.Delete(h)
+	}
+}
+
+// cleanupOutboundConfigCache remove handlers not in outbound manager
+func cleanupOutboundConfigCache(hs []outbound.Handler) {
+	rm := make([]interface{}, 0)
+	outboundConfigCache.Range(func(key interface{}, _ interface{}) bool {
 		for _, h := range hs {
 			if h == key {
 				return true
@@ -286,32 +293,28 @@ func cleanupConfigCache(ctx context.Context, s *handlerServer) {
 	})
 
 	for _, h := range rm {
-		configCache.Delete(h)
+		outboundConfigCache.Delete(h)
 	}
 }
 
 // interceptConfig cache in(out)bound config when handler is created
 func interceptConfig(key interface{}, config interface{}) {
+	if _, ok := config.(proto.Message); !ok {
+		return
+	}
+
 	switch key.(type) {
 	case inbound.Handler:
-		break
+		inboundConfigCache.Store(key, config)
 	case outbound.Handler:
-		break
+		outboundConfigCache.Store(key, config)
 	default:
 		return
 	}
 
-	pb, ok := config.(proto.Message)
-	if !ok {
-		return
-	}
-
-	if tmsg := cserial.ToTypedMessage(pb); tmsg != nil {
-		kt := reflect.TypeOf(key)
-		ct := reflect.TypeOf(config)
-		newError("add ", kt, " with config type ", ct, " to cache").AtDebug().WriteToLog()
-		configCache.Store(key, tmsg)
-	}
+	kt := reflect.TypeOf(key)
+	ct := reflect.TypeOf(config)
+	newError("add ", kt, " with config type ", ct, " to cache").AtDebug().WriteToLog()
 }
 
 func init() {
