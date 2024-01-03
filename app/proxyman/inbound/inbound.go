@@ -80,11 +80,17 @@ func (m *Manager) GetHandler(ctx context.Context, tag string) (inbound.Handler, 
 	m.access.RLock()
 	defer m.access.RUnlock()
 
-	handler, found := m.taggedHandlers[tag]
-	if !found {
-		return nil, newError("handler not found: ", tag)
+	switch t := proxyman.ParseTag(tag).(type) {
+	case int:
+		if t >= 0 && t < len(m.untaggedHandler) {
+			return m.untaggedHandler[t], nil
+		}
+	case string:
+		if h, found := m.taggedHandlers[t]; found {
+			return h, nil
+		}
 	}
-	return handler, nil
+	return nil, newError("handler not found: ", tag)
 }
 
 // RemoveHandler implements inbound.Manager.
