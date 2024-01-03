@@ -14,7 +14,9 @@ import (
 	"github.com/xtls/xray-core/app/policy"
 	"github.com/xtls/xray-core/app/proxyman"
 	"github.com/xtls/xray-core/app/proxyman/command"
+
 	"github.com/xtls/xray-core/app/router"
+	routercmd "github.com/xtls/xray-core/app/router/command"
 	"github.com/xtls/xray-core/app/stats"
 	statscmd "github.com/xtls/xray-core/app/stats/command"
 	"github.com/xtls/xray-core/common"
@@ -31,6 +33,131 @@ import (
 	"github.com/xtls/xray-core/testing/servers/tcp"
 	"google.golang.org/grpc"
 )
+
+func TestRouterGetSetRouting(t *testing.T) {
+	tcpServer := tcp.Server{
+		MsgProcessor: xor,
+	}
+	dest, err := tcpServer.Start()
+	common.Must(err)
+	defer tcpServer.Close()
+
+	oldConfig := &router.Config{
+		Rule: []*router.RoutingRule{
+			{
+				InboundTag: []string{"api"},
+				TargetTag: &router.RoutingRule_Tag{
+					Tag: "api",
+				},
+			},
+		},
+	}
+
+	cmdPort := tcp.PickPort()
+	servConfig := &core.Config{
+		App: []*serial.TypedMessage{
+			serial.ToTypedMessage(&commander.Config{
+				Tag: "api",
+				Service: []*serial.TypedMessage{
+					serial.ToTypedMessage(&routercmd.Config{}),
+				},
+			}),
+			serial.ToTypedMessage(oldConfig),
+		},
+		Inbound: []*core.InboundHandlerConfig{
+			{
+				Tag: "api",
+				ReceiverSettings: serial.ToTypedMessage(&proxyman.ReceiverConfig{
+					PortList: &net.PortList{Range: []*net.PortRange{net.SinglePortRange(cmdPort)}},
+					Listen:   net.NewIPOrDomain(net.LocalHostIP),
+				}),
+				ProxySettings: serial.ToTypedMessage(&dokodemo.Config{
+					Address:  net.NewIPOrDomain(dest.Address),
+					Port:     uint32(dest.Port),
+					Networks: []net.Network{net.Network_TCP},
+				}),
+			},
+		},
+		Outbound: []*core.OutboundHandlerConfig{
+			{
+				Tag:           "default-outbound",
+				ProxySettings: serial.ToTypedMessage(&freedom.Config{}),
+			},
+		},
+	}
+
+	servers, err := InitializeServerConfigs(servConfig)
+	common.Must(err)
+	defer CloseAllServers(servers)
+
+	cmdConn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", cmdPort), grpc.WithInsecure(), grpc.WithBlock())
+	common.Must(err)
+	defer cmdConn.Close()
+
+	client := routercmd.NewRoutingServiceClient(cmdConn)
+
+	ctx := context.Background()
+	getRoutingRulesTest(t, client, 1, 0)
+
+	newConfig := &router.Config{
+		Rule: []*router.RoutingRule{
+			{
+				InboundTag: []string{"api"},
+				TargetTag: &router.RoutingRule_Tag{
+					Tag: "api",
+				},
+			},
+			{
+				InboundTag: []string{"test"},
+				TargetTag: &router.RoutingRule_Tag{
+					Tag: "default-outbound",
+				},
+			},
+		},
+		BalancingRule: []*router.BalancingRule{
+			{
+				Tag:              "pacman",
+				OutboundSelector: []string{"agentout"},
+				Strategy:         "random",
+			},
+		},
+	}
+
+	setResp, err := client.SetRoutingConfig(ctx, &routercmd.SetRoutingConfigRequest{
+		Config: serial.ToTypedMessage(newConfig),
+	})
+	common.Must(err)
+	if setResp == nil {
+		t.Error("unexpected nil response")
+	}
+	getRoutingRulesTest(t, client, 2, 1)
+
+	setResp, err = client.SetRoutingConfig(ctx, &routercmd.SetRoutingConfigRequest{
+		Config: serial.ToTypedMessage(oldConfig),
+	})
+	common.Must(err)
+	if setResp == nil {
+		t.Error("unexpected nil response")
+	}
+	getRoutingRulesTest(t, client, 1, 0)
+}
+
+func getRoutingRulesTest(t *testing.T, client routercmd.RoutingServiceClient, ruleLen int, balancingRuleLen int) {
+	getResp, err := client.GetRoutingConfig(context.Background(), &routercmd.GetRoutingConfigRequest{})
+	if err != nil {
+		t.Error(err)
+	} else if getResp == nil {
+		t.Error("unexpected nil response")
+	} else if pb, err := getResp.Config.GetInstance(); err != nil {
+		t.Error("instance typed message error")
+	} else if config, ok := pb.(*router.Config); !ok {
+		t.Error("protobuf assertion error")
+	} else if len(config.Rule) != ruleLen {
+		t.Error("unexpected routing rules length")
+	} else if len(config.BalancingRule) != balancingRuleLen {
+		t.Error("unexpected balancing roules length")
+	}
+}
 
 func TestProxymanGetAddRemoveOutboundHandler(t *testing.T) {
 	tcpServer := tcp.Server{
