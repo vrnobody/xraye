@@ -25,7 +25,7 @@ var (
 )
 
 var (
-	build    = "Experimental!!"
+	build    = "Experimental #5"
 	codename = "Xray, Penetrates Everything."
 	intro    = "A unified platform for anti-censorship."
 )
