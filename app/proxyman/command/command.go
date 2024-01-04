@@ -107,6 +107,9 @@ func (s *handlerServer) GetAllInbounds(ctx context.Context, request *GetAllInbou
 }
 
 func (s *handlerServer) AddInbound(ctx context.Context, request *AddInboundRequest) (*AddInboundResponse, error) {
+	inboundMutex.Lock()
+	defer inboundMutex.Unlock()
+
 	if err := core.AddInboundHandler(s.s, request.Inbound); err != nil {
 		if hs, err := s.ihm.GetAllHandlers(ctx); err == nil {
 			cleanupInboundConfigCache(hs)
@@ -117,6 +120,9 @@ func (s *handlerServer) AddInbound(ctx context.Context, request *AddInboundReque
 }
 
 func (s *handlerServer) RemoveInbound(ctx context.Context, request *RemoveInboundRequest) (*RemoveInboundResponse, error) {
+	inboundMutex.Lock()
+	defer inboundMutex.Unlock()
+
 	if h, err := s.ihm.GetHandler(ctx, request.Tag); err == nil {
 		if _, ok := inboundConfigCache.LoadAndDelete(h); ok {
 			ht := reflect.TypeOf(h)
@@ -181,6 +187,9 @@ func (s *handlerServer) GetAllOutbounds(ctx context.Context, request *GetAllOutb
 }
 
 func (s *handlerServer) AddOutbound(ctx context.Context, request *AddOutboundRequest) (*AddOutboundResponse, error) {
+	outboundMutex.Lock()
+	defer outboundMutex.Unlock()
+
 	if err := core.AddOutboundHandler(s.s, request.Outbound); err != nil {
 		if hs, err := s.ohm.GetAllHandlers(ctx); err == nil {
 			cleanupOutboundConfigCache(hs)
@@ -191,6 +200,9 @@ func (s *handlerServer) AddOutbound(ctx context.Context, request *AddOutboundReq
 }
 
 func (s *handlerServer) RemoveOutbound(ctx context.Context, request *RemoveOutboundRequest) (*RemoveOutboundResponse, error) {
+	outboundMutex.Lock()
+	defer outboundMutex.Unlock()
+
 	tag := request.Tag
 	resp := &RemoveOutboundResponse{}
 
@@ -274,8 +286,12 @@ func (s *service) Register(server *grpc.Server) {
 	server.RegisterService(&vCoreDesc, hs)
 }
 
-var inboundConfigCache sync.Map
-var outboundConfigCache sync.Map
+var (
+	inboundConfigCache  sync.Map
+	outboundConfigCache sync.Map
+	inboundMutex        sync.Mutex
+	outboundMutex       sync.Mutex
+)
 
 // cleanupInboundConfigCache remove handlers not in inbound manager
 func cleanupInboundConfigCache(hs []inbound.Handler) {
