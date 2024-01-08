@@ -41,6 +41,8 @@ type MultiUserInbound struct {
 	networks []net.Network
 	users    []*User
 	service  *shadowaead_2022.MultiService[int]
+
+	userInfoCache sync.Map
 }
 
 func NewMultiServer(ctx context.Context, config *MultiUserServerConfig) (*MultiUserInbound, error) {
@@ -87,8 +89,6 @@ func NewMultiServer(ctx context.Context, config *MultiUserServerConfig) (*MultiU
 	return inbound, nil
 }
 
-var jsonCache sync.Map
-
 // GetUsers implements proxy.UserManager.GetUsers().
 func (i *MultiUserInbound) GetUsers(ctx context.Context) ([]string, bool) {
 	i.Lock()
@@ -96,7 +96,7 @@ func (i *MultiUserInbound) GetUsers(ctx context.Context) ([]string, bool) {
 
 	users := make([]string, 0)
 	for _, user := range i.users {
-		if j, ok := jsonCache.Load(user); ok {
+		if j, ok := i.userInfoCache.Load(user); ok {
 			if j != nil {
 				if u, ok := j.(string); ok {
 					users = append(users, u)
@@ -107,10 +107,10 @@ func (i *MultiUserInbound) GetUsers(ctx context.Context) ([]string, bool) {
 		if j, err := json.MarshalIndent(user, "", "  "); err == nil {
 			u := string(j)
 			users = append(users, u)
-			jsonCache.Store(user, u)
+			i.userInfoCache.Store(user, u)
 			continue
 		}
-		jsonCache.Store(user, nil)
+		i.userInfoCache.Store(user, nil)
 	}
 	return users, false
 }
@@ -165,7 +165,7 @@ func (i *MultiUserInbound) RemoveUser(ctx context.Context, email string) error {
 		return newError("User ", email, " not found.")
 	}
 
-	jsonCache.Delete(i.users[idx])
+	i.userInfoCache.Delete(i.users[idx])
 	ulen := len(i.users)
 	i.users[idx] = i.users[ulen-1]
 	i.users[ulen-1] = nil

@@ -14,6 +14,8 @@ type Validator struct {
 	// Considering email's usage here, map + sync.Mutex/RWMutex may have better performance.
 	email sync.Map
 	users sync.Map
+
+	userInfoCache sync.Map
 }
 
 // Add a VLESS user, Email must be empty or unique.
@@ -39,13 +41,11 @@ func (v *Validator) Del(e string) error {
 		return newError("User ", e, " not found.")
 	}
 	mu := u.(*protocol.MemoryUser)
-	jsonCache.Delete(mu)
+	v.userInfoCache.Delete(mu)
 	v.email.Delete(le)
 	v.users.Delete(mu.Account.(*MemoryAccount).ID.UUID())
 	return nil
 }
-
-var jsonCache sync.Map
 
 // GetAll users info.
 func (v *Validator) GetAll() ([]string, bool) {
@@ -62,7 +62,7 @@ func (v *Validator) GetAll() ([]string, bool) {
 		if !ok {
 			return true
 		}
-		if o, ok := jsonCache.Load(mu); ok {
+		if o, ok := v.userInfoCache.Load(mu); ok {
 			if o == nil {
 				return true
 			}
@@ -81,11 +81,11 @@ func (v *Validator) GetAll() ([]string, bool) {
 			if j, err := json.MarshalIndent(info, "", "  "); err == nil {
 				user := string(j)
 				users = append(users, user)
-				jsonCache.Store(mu, user)
+				v.userInfoCache.Store(mu, user)
 				return true
 			}
 		}
-		jsonCache.Store(mu, nil)
+		v.userInfoCache.Store(mu, nil)
 		return true
 	})
 	return users, true

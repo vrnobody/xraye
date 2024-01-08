@@ -20,6 +20,8 @@ type Validator struct {
 
 	behaviorSeed  uint64
 	behaviorFused bool
+
+	userInfoCache sync.Map
 }
 
 var ErrNotFound = newError("Not Found")
@@ -44,8 +46,6 @@ func (v *Validator) Add(u *protocol.MemoryUser) error {
 	return nil
 }
 
-var jsonCache sync.Map
-
 // GetAll users info.
 func (v *Validator) GetAll() ([]string, bool) {
 	type info struct {
@@ -56,7 +56,7 @@ func (v *Validator) GetAll() ([]string, bool) {
 
 	users := make([]string, 0)
 	for _, mu := range v.users {
-		if o, ok := jsonCache.Load(mu); ok {
+		if o, ok := v.userInfoCache.Load(mu); ok {
 			if o == nil {
 				continue
 			}
@@ -74,11 +74,11 @@ func (v *Validator) GetAll() ([]string, bool) {
 			if j, err := json.MarshalIndent(info, "", "  "); err == nil {
 				user := string(j)
 				users = append(users, user)
-				jsonCache.Store(mu, user)
+				v.userInfoCache.Store(mu, user)
 				continue
 			}
 		}
-		jsonCache.Store(mu, nil)
+		v.userInfoCache.Store(mu, nil)
 	}
 	return users, true
 }
@@ -104,8 +104,10 @@ func (v *Validator) Del(email string) error {
 	if idx == -1 {
 		return newError("User ", email, " not found.")
 	}
-	ulen := len(v.users)
 
+	v.userInfoCache.Delete(v.users[idx])
+
+	ulen := len(v.users)
 	v.users[idx] = v.users[ulen-1]
 	v.users[ulen-1] = nil
 	v.users = v.users[:ulen-1]

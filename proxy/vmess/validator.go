@@ -23,6 +23,8 @@ type TimedUserValidator struct {
 	behaviorFused bool
 
 	aeadDecoderHolder *aead.AuthIDDecoderHolder
+
+	userInfoCache sync.Map
 }
 
 // NewTimedUserValidator creates a new TimedUserValidator.
@@ -33,8 +35,6 @@ func NewTimedUserValidator() *TimedUserValidator {
 	}
 	return tuv
 }
-
-var jsonCache sync.Map
 
 // GetAll users info.
 func (v *TimedUserValidator) GetAll() ([]string, bool) {
@@ -50,7 +50,7 @@ func (v *TimedUserValidator) GetAll() ([]string, bool) {
 
 	users := make([]string, 0)
 	for _, mu := range v.users {
-		if o, ok := jsonCache.Load(mu); ok {
+		if o, ok := v.userInfoCache.Load(mu); ok {
 			if o == nil {
 				continue
 			}
@@ -69,11 +69,11 @@ func (v *TimedUserValidator) GetAll() ([]string, bool) {
 			if j, err := json.MarshalIndent(info, "", "  "); err == nil {
 				user := string(j)
 				users = append(users, user)
-				jsonCache.Store(mu, user)
+				v.userInfoCache.Store(mu, user)
 				continue
 			}
 		}
-		jsonCache.Store(mu, nil)
+		v.userInfoCache.Store(mu, nil)
 	}
 	return users, true
 }
@@ -131,7 +131,7 @@ func (v *TimedUserValidator) Remove(email string) bool {
 		return false
 	}
 
-	jsonCache.Delete(v.users[idx])
+	v.userInfoCache.Delete(v.users[idx])
 	ulen := len(v.users)
 	v.users[idx] = v.users[ulen-1]
 	v.users[ulen-1] = nil
