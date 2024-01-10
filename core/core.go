@@ -25,7 +25,8 @@ var (
 )
 
 var (
-	build    = "Experimental #6"
+	build    = "Custom"
+	expWarn  = "Experimental #6"
 	codename = "Xray, Penetrates Everything."
 	intro    = "A unified platform for anti-censorship."
 )
@@ -38,8 +39,10 @@ func Version() string {
 
 // VersionStatement returns a list of strings representing the full version info.
 func VersionStatement() []string {
+	// disable unused variable wraning
+	_ = build
 	return []string{
-		serial.Concat("Xray ", Version(), " (", codename, ") ", build, " (", runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, ")"),
+		serial.Concat("Xray ", Version(), " (", codename, ") ", expWarn, " (", runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, ")"),
 		intro,
 	}
 }
