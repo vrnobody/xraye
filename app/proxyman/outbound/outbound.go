@@ -5,6 +5,7 @@ package outbound
 import (
 	"context"
 	"slices"
+	"sort"
 	"strings"
 	"sync"
 
@@ -22,12 +23,14 @@ type Manager struct {
 	taggedHandler    map[string]outbound.Handler
 	untaggedHandlers []outbound.Handler
 	running          bool
+	tagsCache        map[string][]string
 }
 
 // New creates a new Manager.
 func New(ctx context.Context, config *proxyman.OutboundConfig) (*Manager, error) {
 	m := &Manager{
 		taggedHandler: make(map[string]outbound.Handler),
+		tagsCache:     make(map[string][]string),
 	}
 	var _ outbound.Manager = m
 	return m, nil
@@ -112,6 +115,8 @@ func (m *Manager) AddHandler(ctx context.Context, handler outbound.Handler) erro
 	m.access.Lock()
 	defer m.access.Unlock()
 
+	m.tagsCache = make(map[string][]string)
+
 	if m.defaultHandler == nil {
 		m.defaultHandler = handler
 	}
@@ -154,6 +159,8 @@ func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
 	m.access.Lock()
 	defer m.access.Unlock()
 
+	m.tagsCache = make(map[string][]string)
+
 	var handler outbound.Handler
 	switch t := proxyman.ParseTag(tag).(type) {
 	case int:
@@ -171,6 +178,9 @@ func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
 		} else {
 			// do not return error here
 			// app/commander/commander.go Start() will call RemoveHandler("api") and expceting nil.
+
+			// suppress editor wraning
+			_ = 0
 		}
 		delete(m.taggedHandler, t)
 	case *errors.Error:
@@ -187,6 +197,11 @@ func (m *Manager) Select(selectors []string) []string {
 	m.access.RLock()
 	defer m.access.RUnlock()
 
+	key := strings.Join(selectors, ",")
+	if cache, ok := m.tagsCache[key]; ok {
+		return cache
+	}
+
 	tags := make([]string, 0, len(selectors))
 
 	for tag := range m.taggedHandler {
@@ -201,6 +216,12 @@ func (m *Manager) Select(selectors []string) []string {
 			tags = append(tags, tag)
 		}
 	}
+
+	sort.Strings(tags)
+
+	// if selectors changes then routing has already changed
+	m.tagsCache = make(map[string][]string)
+	m.tagsCache[key] = tags
 
 	return tags
 }
