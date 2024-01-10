@@ -1,3 +1,23 @@
+<<<<<<< HEAD
+这个fork在xray-core v1.8.6的基础上添加了以下api子命令：  
+```bash
+geti          获取全部inbounds配置，以json格式输出
+geto          获取全部outbounds配置以json格式输出
+rmi           增加删除tag为空的inbound功能
+rmo           增加删除tag为空的outbound功能
+getr          获取routing配置，以json格式输出
+setr          替换routing配置
+getu          获取inbound的用户信息，只支持vmess, vless, trojan三种协议
+adu           向inbounds添加用户
+rmu           从inbounds删除用户
+```
+[详细用法说明wiki](https://github.com/vrnobody/Xray-core/wiki)  
+[可执行文件下载](https://github.com/vrnobody/Xray-core/releases)  
+  
+这个fork遵循Mozilla Public License Version 2.0协议，简单来说你想怎么用都行。  
+这个只是试验性质的fork，不会跟随xray-core同步更新。   
+原版[README.md](https://github.com/vrnobody/Xray-core/blob/api/README-xtls.md)  
+=======
 # Project X
 
 [Project X](https://github.com/XTLS) originates from XTLS protocol, providing a set of network tools such as [Xray-core](https://github.com/XTLS/Xray-core) and [REALITY](https://github.com/XTLS/REALITY).
@@ -23,10 +43,11 @@
 - Linux Script
   - [XTLS/Xray-install](https://github.com/XTLS/Xray-install)
 - Docker
+  - Official: [ghcr.io/xtls/xray-core](https://ghcr.io/xtls/xray-core) 
   - [iamybj/docker-xray](https://hub.docker.com/r/iamybj/docker-xray)
   - [teddysun/xray](https://hub.docker.com/r/teddysun/xray)
 - Web Panel
-  - [X-UI](https://github.com/FranzKafkaYu/x-ui), [X-UI-English](https://github.com/NidukaAkalanka/x-ui-english), [3X-UI](https://github.com/MHSanaei/3x-ui), [X-UI](https://github.com/alireza0/x-ui), [X-UI](https://github.com/diditra/x-ui)
+  - [X-UI-English](https://github.com/NidukaAkalanka/x-ui-english), [3X-UI](https://github.com/MHSanaei/3x-ui), [X-UI](https://github.com/alireza0/x-ui), [X-UI](https://github.com/diditra/x-ui)
   - [Xray-UI](https://github.com/qist/xray-ui), [X-UI](https://github.com/sing-web/x-ui)
   - [Hiddify](https://github.com/hiddify/hiddify-config)
   - [Marzban](https://github.com/Gozargah/Marzban)
@@ -56,6 +77,7 @@
   - [REALITY (English)](https://cscot.pages.dev/2023/03/02/Xray-REALITY-tutorial/)
   - [XTLS-Iran-Reality (English)](https://github.com/SasukeFreestyle/XTLS-Iran-Reality)
   - [Xray REALITY with 'steal oneself' (English)](https://computerscot.github.io/vless-xtls-utls-reality-steal-oneself.html)
+  - [Xray with WireGuard inbound (English)](https://g800.pages.dev/wireguard)
 
 ## GUI Clients
 
@@ -123,18 +145,11 @@
 
 ## Compilation
 
-### Windows
-
 ```bash
-go build -o xray.exe -trimpath -ldflags "-s -w -buildid=" ./main
-```
-
-### Linux / macOS
-
-```bash
-go build -o xray -trimpath -ldflags "-s -w -buildid=" ./main
+make
 ```
 
 ## Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/XTLS/Xray-core.svg)](https://starchart.cc/XTLS/Xray-core)
+>>>>>>> upstream/main
