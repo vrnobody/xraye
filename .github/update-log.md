@@ -1,5 +1,6 @@
 #### exp #6
-更新xray-core至v1.8.7
+修改round-robin均衡策略  
+更新xray-core至v1.8.7  
 修复内存泄露  
 
 #### exp #5
