@@ -4,7 +4,6 @@ package outbound
 
 import (
 	"context"
-	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -166,7 +165,8 @@ func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
 	case int:
 		if t >= 0 && t < len(m.untaggedHandlers) {
 			handler = m.untaggedHandlers[t]
-			m.untaggedHandlers = slices.Delete(m.untaggedHandlers, t, t+1)
+			uh := m.untaggedHandlers
+			m.untaggedHandlers = append(uh[:t], uh[t+1:]...)
 		} else {
 			err := newError("handler #", t, ", index out of range").AtWarning()
 			err.WriteToLog()

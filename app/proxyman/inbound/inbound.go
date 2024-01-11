@@ -4,7 +4,6 @@ package inbound
 
 import (
 	"context"
-	"slices"
 	"sync"
 
 	"github.com/xtls/xray-core/app/proxyman"
@@ -103,7 +102,8 @@ func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
 	case int:
 		if t >= 0 && t < len(m.untaggedHandler) {
 			handler = m.untaggedHandler[t]
-			m.untaggedHandler = slices.Delete(m.untaggedHandler, t, t+1)
+			uh := m.untaggedHandler
+			m.untaggedHandler = append(uh[:t], uh[t+1:]...)
 		} else {
 			err := newError("handler #", t, ", index out of range").AtWarning()
 			err.WriteToLog(session.ExportIDToError(ctx))
