@@ -83,7 +83,9 @@ func (d *DefaultSystemDialer) Dial(ctx context.Context, src net.Address, dest ne
 
 	if sockopt != nil || len(d.controllers) > 0 {
 		if sockopt != nil && sockopt.TcpMptcp {
-			dialer.SetMultipathTCP(true)
+			// disable for win7
+			// dialer.SetMultipathTCP(true)
+			_ = 0
 		}
 		dialer.Control = func(network, address string, c syscall.RawConn) error {
 			for _, ctl := range d.controllers {
