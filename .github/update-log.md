@@ -1,3 +1,9 @@
+#### exp #7
+支持win7  
+降级golang至1.20  
+禁用MultipathTCP功能  
+移除slices包依赖  
+
 #### exp #6
 修改round-robin均衡策略  
 更新xray-core至v1.8.7  
