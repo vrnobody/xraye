@@ -218,9 +218,6 @@ func (m *Manager) Select(selectors []string) []string {
 	}
 
 	sort.Strings(tags)
-
-	// if selectors changes then routing has already changed
-	m.tagsCache = make(map[string][]string)
 	m.tagsCache[key] = tags
 
 	return tags
