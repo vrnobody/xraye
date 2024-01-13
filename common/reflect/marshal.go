@@ -149,7 +149,6 @@ func isValueKind(kind reflect.Kind) bool {
 	default:
 		return false
 	}
-
 }
 
 func marshalInterface(v interface{}, ignoreNullValue bool) interface{} {

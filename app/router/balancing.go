@@ -30,15 +30,15 @@ type RoundRobinStrategy struct {
 }
 
 func (s *RoundRobinStrategy) PickOutbound(tags []string) string {
-	l := len(tags)
-	if l == 0 {
+	n := len(tags)
+	if n == 0 {
 		panic("0 tags")
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	tag := tags[s.index%l]
-	s.index = (s.index + 1) % l
+	tag := tags[s.index%n]
+	s.index = (s.index + 1) % n
 	return tag
 }
 
