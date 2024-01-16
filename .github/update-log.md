@@ -1,8 +1,8 @@
 #### exp #7
-支持win7  
-降级golang至1.20  
+降级golang至1.20（支持win7）  
 禁用MultipathTCP功能  
 移除slices包依赖  
+修复负载均衡并发报错退出的bug  
 
 #### exp #6
 修改round-robin均衡策略  
