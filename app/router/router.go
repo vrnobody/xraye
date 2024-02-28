@@ -24,6 +24,7 @@ type Router struct {
 	ctx            context.Context
 	ohm            outbound.Manager
 	mu             sync.Mutex
+	dispatcher     routing.Dispatcher
 	config         *Config
 }
 
@@ -35,10 +36,12 @@ type Route struct {
 }
 
 // Init initializes the Router.
-func (r *Router) Init(ctx context.Context, config *Config, d dns.Client, ohm outbound.Manager) error {
+func (r *Router) Init(ctx context.Context, config *Config, d dns.Client, ohm outbound.Manager, dispatcher routing.Dispatcher) error {
+	r.domainStrategy = config.DomainStrategy
 	r.dns = d
 	r.ctx = ctx
 	r.ohm = ohm
+	r.dispatcher = dispatcher
 	return r.Reload(config)
 }
 
@@ -68,7 +71,7 @@ func (r *Router) Reload(config *Config) error {
 
 	balancers := make(map[string]*Balancer, len(config.BalancingRule))
 	for _, rule := range config.BalancingRule {
-		balancer, err := rule.Build(r.ohm)
+		balancer, err := rule.Build(r.ohm, r.dispatcher)
 		if err != nil {
 			return err
 		}
@@ -150,12 +153,12 @@ func (r *Router) pickRouteInternal(ctx routing.Context) (*Rule, routing.Context,
 }
 
 // Start implements common.Runnable.
-func (*Router) Start() error {
+func (r *Router) Start() error {
 	return nil
 }
 
 // Close implements common.Closable.
-func (*Router) Close() error {
+func (r *Router) Close() error {
 	return nil
 }
 
@@ -177,9 +180,8 @@ func (r *Route) GetOutboundTag() string {
 func init() {
 	common.Must(common.RegisterConfig((*Config)(nil), func(ctx context.Context, config interface{}) (interface{}, error) {
 		r := new(Router)
-		var _ routing.Router = r
-		if err := core.RequireFeatures(ctx, func(d dns.Client, ohm outbound.Manager) error {
-			return r.Init(ctx, config.(*Config), d, ohm)
+		if err := core.RequireFeatures(ctx, func(d dns.Client, ohm outbound.Manager, dispatcher routing.Dispatcher) error {
+			return r.Init(ctx, config.(*Config), d, ohm, dispatcher)
 		}); err != nil {
 			return nil, err
 		}
