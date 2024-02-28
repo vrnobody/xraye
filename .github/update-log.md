@@ -1,3 +1,6 @@
+#### exp #8
+更新xray-core至v1.8.8  
+
 #### exp #7
 降级golang至1.20（支持win7）  
 禁用MultipathTCP功能  
@@ -14,3 +17,6 @@
 
 #### exp #4
 修复bug，基本可用  
+
+修改go.mod后执行`go mod tidy`更新go.sum  
+版本信息：core\core.go  
