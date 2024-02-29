@@ -17,6 +17,3 @@
 
 #### exp #4
 修复bug，基本可用  
-
-修改go.mod后执行`go mod tidy`更新go.sum  
-版本信息：core\core.go  
