@@ -1,7 +1,10 @@
-name: release experimental
+name: release exp
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - '**'
 
 jobs:
   prepare:
