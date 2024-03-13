@@ -1,22 +1,5 @@
 <<<<<<< HEAD
-这个fork在xray-core v1.8.6的基础上添加了以下api子命令：  
-```bash
-geti          获取全部inbounds配置，以json格式输出
-geto          获取全部outbounds配置以json格式输出
-rmi           增加删除tag为空的inbound功能
-rmo           增加删除tag为空的outbound功能
-getr          获取routing配置，以json格式输出
-setr          替换routing配置
-getu          获取inbound的用户信息，只支持vmess, vless, trojan三种协议
-adu           向inbounds添加用户
-rmu           从inbounds删除用户
-```
-[详细用法说明wiki](https://github.com/vrnobody/Xray-core/wiki)  
-[可执行文件下载](https://github.com/vrnobody/Xray-core/releases)  
-  
-这个fork遵循Mozilla Public License Version 2.0协议，简单来说你想怎么用都行。  
-这个只是试验性质的fork，不会跟随xray-core同步更新。   
-原版[README.md](https://github.com/vrnobody/Xray-core/blob/api/README-xtls.md)  
+这个fork在xray-core的基础上添加了以下api子命令：  
 =======
 # Project X
 
@@ -42,6 +25,7 @@ rmu           从inbounds删除用户
 
 - Linux Script
   - [XTLS/Xray-install](https://github.com/XTLS/Xray-install)
+  - [team-cloudchaser/tempest](https://github.com/team-cloudchaser/tempest) (supports [`systemd`](https://systemd.io) and [OpenRC](https://github.com/OpenRC/openrc); Linux-only)
 - Docker
   - Official: [ghcr.io/xtls/xray-core](https://ghcr.io/xtls/xray-core) 
   - [iamybj/docker-xray](https://hub.docker.com/r/iamybj/docker-xray)
@@ -54,7 +38,7 @@ rmu           从inbounds删除用户
   - [Libertea](https://github.com/VZiChoushaDui/Libertea)
 - One Click
   - [Xray-REALITY](https://github.com/zxcvos/Xray-script), [xray-reality](https://github.com/sajjaddg/xray-reality), [reality-ezpz](https://github.com/aleskxyz/reality-ezpz)
-  - [Xray-script](https://github.com/kirin10000/Xray-script), [Xray_bash_onekey](https://github.com/hello-yunshu/Xray_bash_onekey), [XTool](https://github.com/LordPenguin666/XTool)
+  - [Xray_bash_onekey](https://github.com/hello-yunshu/Xray_bash_onekey), [XTool](https://github.com/LordPenguin666/XTool)
   - [v2ray-agent](https://github.com/mack-a/v2ray-agent), [Xray_onekey](https://github.com/wulabing/Xray_onekey), [ProxySU](https://github.com/proxysu/ProxySU)
 - Magisk
   - [Xray4Magisk](https://github.com/Asterisk4Magisk/Xray4Magisk)
@@ -121,6 +105,7 @@ rmu           从inbounds删除用户
   - [AndroidLibXrayLite](https://github.com/2dust/AndroidLibXrayLite)
   - [XrayKit](https://github.com/arror/XrayKit)
   - [Xray-core-python](https://github.com/LorenEteval/Xray-core-python)
+  - [xray-api](https://github.com/XVGuardian/xray-api)
 - [XrayR](https://github.com/XrayR-project/XrayR)
   - [XrayR-release](https://github.com/XrayR-project/XrayR-release)
   - [XrayR-V2Board](https://github.com/missuo/XrayR-V2Board)
@@ -145,11 +130,31 @@ rmu           从inbounds删除用户
 
 ## Compilation
 
-```bash
-make
+### Windows (PowerShell)
+
+```powershell
+$env:CGO_ENABLED=0
+go build -o xray.exe -trimpath -ldflags "-s -w -buildid=" ./main
 ```
 
-## Stargazers over time
+### Linux / macOS
 
-[![Stargazers over time](https://starchart.cc/XTLS/Xray-core.svg)](https://starchart.cc/XTLS/Xray-core)
 >>>>>>> upstream/main
+```bash
+geti          获取全部inbounds配置，以json格式输出
+geto          获取全部outbounds配置以json格式输出
+rmi           增加删除tag为空的inbound功能
+rmo           增加删除tag为空的outbound功能
+getr          获取routing配置，以json格式输出
+setr          替换routing配置
+getu          获取inbound的用户信息，只支持vmess, vless, trojan三种协议
+adu           向inbounds添加用户
+rmu           从inbounds删除用户
+```
+[详细用法说明wiki](https://github.com/vrnobody/Xray-core/wiki)  
+[可执行文件下载](https://github.com/vrnobody/Xray-core/releases)  
+[更新日志](https://github.com/vrnobody/Xray-core/blob/api/.github/update-log.md)  
+  
+这个fork遵循Mozilla Public License Version 2.0协议，简单来说你想怎么用都行。  
+这个只是试验性质的fork，不会跟随xray-core同步更新。   
+原版[README.md](https://github.com/vrnobody/Xray-core/blob/api/README-xtls.md)  

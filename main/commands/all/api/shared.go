@@ -12,8 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/protobuf/encoding/protojson"
-
 	"github.com/xtls/xray-core/common/protocol"
 
 	"github.com/xtls/xray-core/core"
@@ -24,6 +22,9 @@ import (
 	trojanin "github.com/xtls/xray-core/proxy/trojan"
 	vlessin "github.com/xtls/xray-core/proxy/vless/inbound"
 	vmessin "github.com/xtls/xray-core/proxy/vmess/inbound"
+
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/xtls/xray-core/common/buf"
 	"github.com/xtls/xray-core/main/commands/base"
@@ -49,7 +50,7 @@ func setSharedFlags(cmd *base.Command) {
 
 func dialAPIServer() (conn *grpc.ClientConn, ctx context.Context, close func()) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(apiTimeout)*time.Second)
-	conn, err := grpc.DialContext(ctx, apiServerAddrPtr, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.DialContext(ctx, apiServerAddrPtr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		base.Fatalf("failed to dial %s", apiServerAddrPtr)
 	}
