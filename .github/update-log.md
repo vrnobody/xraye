@@ -1,3 +1,6 @@
+#### exp #9
+更新xray-core至v1.8.9  
+
 #### exp #8
 更新xray-core至v1.8.8  
 
