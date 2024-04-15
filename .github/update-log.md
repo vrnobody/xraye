@@ -1,3 +1,7 @@
+#### exp #10
+更新xray-core至v1.8.10  
+去除routing相关的adrules/rmrules/sib命令，因为和getr/setr命令冲突  
+
 #### exp #9
 更新xray-core至v1.8.9  
 
