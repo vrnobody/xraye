@@ -11,7 +11,6 @@ import (
 
 type Rule struct {
 	Tag       string
-	RuleTag   string
 	Balancer  *Balancer
 	Condition Condition
 }
@@ -151,7 +150,7 @@ func (br *BalancingRule) Build(ohm outbound.Manager, dispatcher routing.Dispatch
 		leastLoadStrategy := NewLeastLoadStrategy(s)
 		return &Balancer{
 			selectors:   br.OutboundSelector,
-			ohm:         ohm,
+			ohm:         ohm, 
 			fallbackTag: br.FallbackTag,
 			strategy:    leastLoadStrategy,
 		}, nil
@@ -160,7 +159,7 @@ func (br *BalancingRule) Build(ohm outbound.Manager, dispatcher routing.Dispatch
 	case "":
 		return &Balancer{
 			selectors:   br.OutboundSelector,
-			ohm:         ohm,
+			ohm:         ohm, 
 			fallbackTag: br.FallbackTag,
 			strategy:    &RandomStrategy{},
 		}, nil

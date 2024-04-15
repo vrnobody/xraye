@@ -139,7 +139,6 @@ func (c *RouterConfig) Build() (*router.Config, error) {
 }
 
 type RouterRule struct {
-	RuleTag     string `json:"ruleTag"`
 	Type        string `json:"type"`
 	OutboundTag string `json:"outboundTag"`
 	BalancerTag string `json:"balancerTag"`
@@ -561,7 +560,6 @@ func parseFieldRule(msg json.RawMessage) (*router.RoutingRule, error) {
 	}
 
 	rule := new(router.RoutingRule)
-	rule.RuleTag = rawFieldRule.RuleTag
 	switch {
 	case len(rawFieldRule.OutboundTag) > 0:
 		rule.TargetTag = &router.RoutingRule_Tag{
