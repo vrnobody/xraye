@@ -2,6 +2,7 @@
 go 1.20支持的最高版本：  
 ```bash
 github.com/quic-go/quic-go v0.40.1
+gvisor.dev/gvisor v0.0.0-20231104011432-48a6d7d5bd0b
 ```
 修改go.mod后执行`go mod tidy`更新go.sum  
 
