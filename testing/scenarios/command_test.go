@@ -662,7 +662,7 @@ func createInbound(dest net.Destination, tag string) *core.InboundHandlerConfig 
 	}
 }
 
-func TestCommanderLinstenConfigurationItem(t *testing.T) {
+func TestCommanderListenConfigurationItem(t *testing.T) {
 	tcpServer := tcp.Server{
 		MsgProcessor: xor,
 	}

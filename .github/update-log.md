@@ -1,5 +1,5 @@
-#### exp #11 (未发布)
-添加api.listen配置项，简化api配置  
+#### exp #11
+更新xray-core至v1.8.13  
 
 #### exp #10
 更新xray-core至v1.8.10  
