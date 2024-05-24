@@ -1,3 +1,7 @@
+#### exp #12 (未发布)
+切换至golang v1.21.4  
+恢复MultipathTCP功能  
+
 #### exp #11
 更新xray-core至v1.8.13  
 
