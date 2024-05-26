@@ -1,4 +1,5 @@
 [![Unit Tests][1]][2] [![Release][3]][4] [![Total Downloads][5]][6] [![License][7]][8]  
+
 [1]: https://github.com/vrnobody/xraye/actions/workflows/test.yml/badge.svg "Unit Tests Status Badge"
 [2]: https://github.com/vrnobody/xraye/actions/workflows/test.yml "Workflow"
 [3]: https://img.shields.io/github/release/vrnobody/xraye.svg "Release Badge"
