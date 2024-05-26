@@ -1,4 +1,4 @@
-#### exp #12 (未发布)
+#### exp #12
 切换至golang v1.21.4  
 恢复MultipathTCP功能  
 

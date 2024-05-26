@@ -10,10 +10,10 @@ getu          获取inbound的用户信息，只支持vmess, vless, trojan三种
 adu           向inbounds添加用户
 rmu           从inbounds删除用户
 ```
-[详细用法说明wiki](https://github.com/vrnobody/Xray-core/wiki)  
-[可执行文件下载](https://github.com/vrnobody/Xray-core/releases)  
-[更新日志](https://github.com/vrnobody/Xray-core/blob/api/.github/update-log.md)  
+[详细用法说明wiki](https://github.com/vrnobody/xraye/wiki)  
+[可执行文件下载](https://github.com/vrnobody/xraye/releases)  
+[更新日志](./.github/update-log.md)  
   
 这个fork遵循Mozilla Public License Version 2.0协议，简单来说你想怎么用都行。  
 这个只是试验性质的fork，不会跟随xray-core同步更新。   
-原版[README.md](https://github.com/vrnobody/Xray-core/blob/api/README-xtls.md)  
+原版[README.md](./README-xtls.md)  

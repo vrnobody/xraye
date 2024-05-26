@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - api
+      - main
 
 jobs:
   prepare:
@@ -70,7 +70,7 @@ jobs:
       - name: Checkout codebase
         uses: actions/checkout@v4
         with:
-          ref: api
+          ref: main
       - name: Restore Cache
         uses: actions/cache/restore@v4
         with:
