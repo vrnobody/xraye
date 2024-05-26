@@ -1,3 +1,13 @@
+[![Unit Tests][1]][2] [![Release][3]][4] [![Total Downloads][5]][6] [![License][7]][8]  
+[1]: https://github.com/vrnobody/xraye/actions/workflows/test.yml/badge.svg "Unit Tests Status Badge"
+[2]: https://github.com/vrnobody/xraye/actions/workflows/test.yml "Workflow"
+[3]: https://img.shields.io/github/release/vrnobody/xraye.svg "Release Badge"
+[4]: https://github.com/vrnobody/xraye/releases/latest "Releases"
+[5]: https://img.shields.io/github/downloads/vrnobody/xraye/total.svg "Total Downloads Badge"
+[6]: https://somsubhra.github.io/github-release-stats/?username=vrnobody&repository=xraye&per_page=30 "Download Details"
+[7]: https://img.shields.io/github/license/vrnobody/xraye.svg "Licence Badge"
+[8]: https://github.com/vrnobody/xraye/blob/main/LICENSE "Licence"
+
 这个fork在xray-core的基础上添加了以下api子命令：  
 ```bash
 geti          获取全部inbounds配置，以json格式输出
