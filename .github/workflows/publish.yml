@@ -71,8 +71,9 @@ jobs:
             goos: darwin
         include:
           # BEIGIN MacOS ARM64
-          - goos: darwin
-            goarch: arm64
+          # golang v1.21.4 do not support new Mac CPU
+          # - goos: darwin
+          #  goarch: arm64
           # END MacOS ARM64
           # BEGIN Linux ARM 5 6 7
           - goos: linux
@@ -172,7 +173,7 @@ jobs:
         run: |
           mkdir -p build_assets
           make
-          find . -maxdepth 1 -type f -regex '.*\(wxray\|xray\|xray_softfloat\)\(\|.exe\)' -exec mv {} ./build_assets/ \;
+          find . -maxdepth 1 -type f -regex './\(wxray\|xray\|xray_softfloat\)\(\|.exe\)' -exec mv {} ./build_assets/ \;
 
       - name: Restore Cache
         uses: actions/cache/restore@v4
@@ -187,6 +188,7 @@ jobs:
           cp ${GITHUB_WORKSPACE}/LICENSE ./build_assets/LICENSE
 
       - name: Create ZIP archive
+        if: github.event_name == 'release'
         shell: bash
         run: |
           pushd build_assets || exit 1

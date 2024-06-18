@@ -1,3 +1,7 @@
+#### exp #13
+更新xray-core至v1.8.15  
+移除Mac arm系列发布文件，因为golang v1.21.4不支持新的Mac CPU  
+
 #### exp #12
 切换至golang v1.21.4  
 恢复MultipathTCP功能  
