@@ -4,10 +4,12 @@ package inbound
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/xtls/xray-core/app/proxyman"
 	"github.com/xtls/xray-core/common"
+	"github.com/xtls/xray-core/common/errors"
 	"github.com/xtls/xray-core/common/serial"
 	"github.com/xtls/xray-core/common/session"
 	"github.com/xtls/xray-core/core"
@@ -49,7 +51,7 @@ func (m *Manager) GetAllHandlers(ctx context.Context) ([]inbound.Handler, error)
 		}
 		return hs, nil
 	}
-	return nil, newError("no handler found")
+	return nil, errors.New("no handler found")
 }
 
 // AddHandler implements inbound.Manager.
@@ -60,7 +62,7 @@ func (m *Manager) AddHandler(ctx context.Context, handler inbound.Handler) error
 	tag := handler.Tag()
 	if len(tag) > 0 {
 		if _, found := m.taggedHandlers[tag]; found {
-			return newError("existing tag found: " + tag)
+			return errors.New("existing tag found: " + tag)
 		}
 		m.taggedHandlers[tag] = handler
 	} else {
@@ -89,7 +91,7 @@ func (m *Manager) GetHandler(ctx context.Context, tag string) (inbound.Handler, 
 			return h, nil
 		}
 	}
-	return nil, newError("handler not found: ", tag)
+	return nil, errors.New("handler not found: ", tag)
 }
 
 // RemoveHandler implements inbound.Manager.
@@ -105,18 +107,18 @@ func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
 			uh := m.untaggedHandler
 			m.untaggedHandler = append(uh[:t], uh[t+1:]...)
 		} else {
-			err := newError("handler #", t, ", index out of range").AtWarning()
-			err.WriteToLog(session.ExportIDToError(ctx))
-			return err
+			emsg := fmt.Sprintf("handler #%d index out of range", t)
+			errors.LogWarning(ctx, emsg)
+			return errors.New(emsg)
 		}
 	case string:
 		if h, found := m.taggedHandlers[t]; found {
 			handler = h
 			delete(m.taggedHandlers, t)
 		} else {
-			err := newError("handler ", t, " not found").AtWarning()
-			err.WriteToLog(session.ExportIDToError(ctx))
-			return err
+			emsg := fmt.Sprintf("handler %s not found", t)
+			errors.LogWarning(ctx, emsg)
+			return errors.New(emsg)
 		}
 	case error:
 		return t
@@ -124,7 +126,7 @@ func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
 
 	if handler != nil {
 		if err := handler.Close(); err != nil {
-			newError("failed to close handler ", tag).Base(err).AtWarning().WriteToLog(session.ExportIDToError(ctx))
+			errors.LogWarningInner(ctx, err, "failed to close handler ", tag)
 		}
 		return nil
 	}
@@ -159,20 +161,20 @@ func (m *Manager) Close() error {
 
 	m.running = false
 
-	var errors []interface{}
+	var errs []interface{}
 	for _, handler := range m.taggedHandlers {
 		if err := handler.Close(); err != nil {
-			errors = append(errors, err)
+			errs = append(errs, err)
 		}
 	}
 	for _, handler := range m.untaggedHandler {
 		if err := handler.Close(); err != nil {
-			errors = append(errors, err)
+			errs = append(errs, err)
 		}
 	}
 
-	if len(errors) > 0 {
-		return newError("failed to close all handlers").Base(newError(serial.Concat(errors...)))
+	if len(errs) > 0 {
+		return errors.New("failed to close all handlers").Base(errors.New(serial.Concat(errs...)))
 	}
 
 	return nil
@@ -192,7 +194,7 @@ func NewHandler(ctx context.Context, config *core.InboundHandlerConfig) (inbound
 
 	receiverSettings, ok := rawReceiverSettings.(*proxyman.ReceiverConfig)
 	if !ok {
-		return nil, newError("not a ReceiverConfig").AtError()
+		return nil, errors.New("not a ReceiverConfig").AtError()
 	}
 
 	streamSettings := receiverSettings.StreamSettings
@@ -210,7 +212,7 @@ func NewHandler(ctx context.Context, config *core.InboundHandlerConfig) (inbound
 	if allocStrategy.Type == proxyman.AllocationStrategy_Random {
 		return NewDynamicInboundHandler(ctx, tag, receiverSettings, proxySettings)
 	}
-	return nil, newError("unknown allocation strategy: ", receiverSettings.AllocationStrategy.Type).AtError()
+	return nil, errors.New("unknown allocation strategy: ", receiverSettings.AllocationStrategy.Type).AtError()
 }
 
 func init() {

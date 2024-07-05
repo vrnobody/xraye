@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/xtls/xray-core/common"
+	"github.com/xtls/xray-core/common/errors"
 	"github.com/xtls/xray-core/core"
 
 	"github.com/xtls/xray-core/features/inbound"
@@ -37,7 +38,7 @@ type InboundQueryOperation interface {
 func getInbound(handler inbound.Handler) (proxy.Inbound, error) {
 	gi, ok := handler.(proxy.GetInbound)
 	if !ok {
-		return nil, newError("can't get inbound proxy from handler.")
+		return nil, errors.New("can't get inbound proxy from handler.")
 	}
 	return gi.GetInbound(), nil
 }
@@ -50,11 +51,11 @@ func (op *AddUserOperation) ApplyInbound(ctx context.Context, handler inbound.Ha
 	}
 	um, ok := p.(proxy.UserManager)
 	if !ok {
-		return newError("proxy is not a UserManager")
+		return errors.New("proxy is not a UserManager")
 	}
 	mUser, err := op.User.ToMemoryUser()
 	if err != nil {
-		return newError("failed to parse user").Base(err)
+		return errors.New("failed to parse user").Base(err)
 	}
 	return um.AddUser(ctx, mUser)
 }
@@ -67,7 +68,7 @@ func (op *RemoveUserOperation) ApplyInbound(ctx context.Context, handler inbound
 	}
 	um, ok := p.(proxy.UserManager)
 	if !ok {
-		return newError("proxy is not a UserManager")
+		return errors.New("proxy is not a UserManager")
 	}
 	return um.RemoveUser(ctx, op.Email)
 }
@@ -79,12 +80,12 @@ func (op *GetUsersOperation) QueryInbound(ctx context.Context, handler inbound.H
 	}
 	um, ok := p.(proxy.UserManager)
 	if !ok {
-		return nil, newError("proxy is not a UserManager")
+		return nil, errors.New("proxy is not a UserManager")
 	}
 	if content, ok := um.GetUsers(ctx); ok {
 		return content, nil
 	}
-	return nil, newError("failed to get users")
+	return nil, errors.New("failed to get users")
 }
 
 type handlerServer struct {
@@ -126,7 +127,7 @@ func (s *handlerServer) RemoveInbound(ctx context.Context, request *RemoveInboun
 	if h, err := s.ihm.GetHandler(ctx, request.Tag); err == nil {
 		if _, ok := inboundConfigCache.LoadAndDelete(h); ok {
 			ht := reflect.TypeOf(h)
-			newError("remove ", ht, " from cache").AtDebug().WriteToLog()
+			errors.LogDebug(ctx, "remove ", ht, " from cache")
 		}
 	}
 	return &RemoveInboundResponse{}, s.ihm.RemoveHandler(ctx, request.Tag)
@@ -135,16 +136,16 @@ func (s *handlerServer) RemoveInbound(ctx context.Context, request *RemoveInboun
 func (s *handlerServer) AlterInbound(ctx context.Context, request *AlterInboundRequest) (*AlterInboundResponse, error) {
 	rawOperation, err := request.Operation.GetInstance()
 	if err != nil {
-		return nil, newError("unknown operation").Base(err)
+		return nil, errors.New("unknown operation").Base(err)
 	}
 	operation, ok := rawOperation.(InboundOperation)
 	if !ok {
-		return nil, newError("not an inbound operation")
+		return nil, errors.New("not an inbound operation")
 	}
 
 	handler, err := s.ihm.GetHandler(ctx, request.Tag)
 	if err != nil {
-		return nil, newError("failed to get handler: ", request.Tag).Base(err)
+		return nil, errors.New("failed to get handler: ", request.Tag).Base(err)
 	}
 
 	return &AlterInboundResponse{}, operation.ApplyInbound(ctx, handler)
@@ -153,16 +154,16 @@ func (s *handlerServer) AlterInbound(ctx context.Context, request *AlterInboundR
 func (s *handlerServer) QueryInbound(ctx context.Context, request *QueryInboundRequest) (*QueryInboundResponse, error) {
 	rawOperation, err := request.Operation.GetInstance()
 	if err != nil {
-		return nil, newError("unknown operation").Base(err)
+		return nil, errors.New("unknown operation").Base(err)
 	}
 	operation, ok := rawOperation.(InboundQueryOperation)
 	if !ok {
-		return nil, newError("not an inbound operation")
+		return nil, errors.New("not an inbound operation")
 	}
 
 	handler, err := s.ihm.GetHandler(ctx, request.Tag)
 	if err != nil {
-		return nil, newError("failed to get handler: ", request.Tag).Base(err)
+		return nil, errors.New("failed to get handler: ", request.Tag).Base(err)
 	}
 
 	resp, err := operation.QueryInbound(ctx, handler)
@@ -210,7 +211,7 @@ func (s *handlerServer) RemoveOutbound(ctx context.Context, request *RemoveOutbo
 		h := s.ohm.GetHandler(tag)
 		if _, ok := outboundConfigCache.LoadAndDelete(h); ok {
 			ht := reflect.TypeOf(h)
-			newError("remove ", ht, " from config cache").AtDebug().WriteToLog()
+			errors.LogDebug(ctx, "remove ", ht, " from config cache")
 		}
 		return resp, s.ohm.RemoveHandler(ctx, tag)
 	}
@@ -246,18 +247,18 @@ func (s *handlerServer) RemoveOutbound(ctx context.Context, request *RemoveOutbo
 			}
 		}
 	}
-	newError("all outbounds are removed from config cache").AtDebug().WriteToLog()
+	errors.LogDebug(ctx, "all outbounds are removed from config cache")
 	return resp, nil
 }
 
 func (s *handlerServer) AlterOutbound(ctx context.Context, request *AlterOutboundRequest) (*AlterOutboundResponse, error) {
 	rawOperation, err := request.Operation.GetInstance()
 	if err != nil {
-		return nil, newError("unknown operation").Base(err)
+		return nil, errors.New("unknown operation").Base(err)
 	}
 	operation, ok := rawOperation.(OutboundOperation)
 	if !ok {
-		return nil, newError("not an outbound operation")
+		return nil, errors.New("not an outbound operation")
 	}
 
 	handler := s.ohm.GetHandler(request.Tag)
@@ -303,7 +304,7 @@ func cleanupInboundConfigCache(hs []inbound.Handler) {
 			}
 		}
 		kt := reflect.TypeOf(key)
-		newError("remove ", kt, " from cache").AtDebug().WriteToLog()
+		errors.LogDebug(nil, "remove ", kt, " from cache")
 		rm = append(rm, key)
 		return true
 	})
@@ -322,7 +323,7 @@ func cleanupOutboundConfigCache(hs []outbound.Handler) {
 			}
 		}
 		kt := reflect.TypeOf(key)
-		newError("remove ", kt, " from cache").AtDebug().WriteToLog()
+		errors.LogDebug(nil, "remove ", kt, " from cache")
 		rm = append(rm, key)
 		return true
 	})
@@ -349,7 +350,7 @@ func interceptConfig(key interface{}, config interface{}) {
 
 	kt := reflect.TypeOf(key)
 	ct := reflect.TypeOf(config)
-	newError("add ", kt, " with config type ", ct, " to cache").AtDebug().WriteToLog()
+	errors.LogDebug(nil, "add ", kt, " with config type ", ct, " to cache")
 }
 
 func init() {

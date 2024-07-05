@@ -6,6 +6,7 @@ import (
 
 	"github.com/xtls/xray-core/common"
 	"github.com/xtls/xray-core/common/buf"
+	"github.com/xtls/xray-core/common/errors"
 	"github.com/xtls/xray-core/common/log"
 	"github.com/xtls/xray-core/common/net"
 	"github.com/xtls/xray-core/common/protocol"
@@ -34,11 +35,11 @@ func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
 	for _, user := range config.Users {
 		u, err := user.ToMemoryUser()
 		if err != nil {
-			return nil, newError("failed to get shadowsocks user").Base(err).AtError()
+			return nil, errors.New("failed to get shadowsocks user").Base(err).AtError()
 		}
 
 		if err := validator.Add(u); err != nil {
-			return nil, newError("failed to add user").Base(err).AtError()
+			return nil, errors.New("failed to add user").Base(err).AtError()
 		}
 	}
 
@@ -89,7 +90,7 @@ func (s *Server) Process(ctx context.Context, network net.Network, conn stat.Con
 	case net.Network_UDP:
 		return s.handleUDPPayload(ctx, conn, dispatcher)
 	default:
-		return newError("unknown network: ", network)
+		return errors.New("unknown network: ", network)
 	}
 }
 
@@ -113,7 +114,7 @@ func (s *Server) handleUDPPayload(ctx context.Context, conn stat.Connection, dis
 		data, err := EncodeUDPPacket(request, payload.Bytes())
 		payload.Release()
 		if err != nil {
-			newError("failed to encode UDP packet").Base(err).AtWarning().WriteToLog(session.ExportIDToError(ctx))
+			errors.LogWarningInner(ctx, err, "failed to encode UDP packet")
 			return
 		}
 		defer data.Release()
@@ -148,7 +149,7 @@ func (s *Server) handleUDPPayload(ctx context.Context, conn stat.Connection, dis
 
 			if err != nil {
 				if inbound.Source.IsValid() {
-					newError("dropping invalid UDP packet from: ", inbound.Source).Base(err).WriteToLog(session.ExportIDToError(ctx))
+					errors.LogInfoInner(ctx, err, "dropping invalid UDP packet from: ", inbound.Source)
 					log.Record(&log.AccessMessage{
 						From:   inbound.Source,
 						To:     "",
@@ -172,7 +173,7 @@ func (s *Server) handleUDPPayload(ctx context.Context, conn stat.Connection, dis
 					Email:  request.User.Email,
 				})
 			}
-			newError("tunnelling request to ", destination).WriteToLog(session.ExportIDToError(currentPacketCtx))
+			errors.LogInfo(ctx, "tunnelling request to ", destination)
 
 			data.UDP = &destination
 
@@ -191,7 +192,7 @@ func (s *Server) handleUDPPayload(ctx context.Context, conn stat.Connection, dis
 func (s *Server) handleConnection(ctx context.Context, conn stat.Connection, dispatcher routing.Dispatcher) error {
 	sessionPolicy := s.policyManager.ForLevel(0)
 	if err := conn.SetReadDeadline(time.Now().Add(sessionPolicy.Timeouts.Handshake)); err != nil {
-		return newError("unable to set read deadline").Base(err).AtWarning()
+		return errors.New("unable to set read deadline").Base(err).AtWarning()
 	}
 
 	bufferedReader := buf.BufferedReader{Reader: buf.NewReader(conn)}
@@ -203,7 +204,7 @@ func (s *Server) handleConnection(ctx context.Context, conn stat.Connection, dis
 			Status: log.AccessRejected,
 			Reason: err,
 		})
-		return newError("failed to create request from: ", conn.RemoteAddr()).Base(err)
+		return errors.New("failed to create request from: ", conn.RemoteAddr()).Base(err)
 	}
 	conn.SetReadDeadline(time.Time{})
 
@@ -221,7 +222,7 @@ func (s *Server) handleConnection(ctx context.Context, conn stat.Connection, dis
 		Reason: "",
 		Email:  request.User.Email,
 	})
-	newError("tunnelling request to ", dest).WriteToLog(session.ExportIDToError(ctx))
+	errors.LogInfo(ctx, "tunnelling request to ", dest)
 
 	sessionPolicy = s.policyManager.ForLevel(request.User.Level)
 	ctx, cancel := context.WithCancel(ctx)
@@ -239,7 +240,7 @@ func (s *Server) handleConnection(ctx context.Context, conn stat.Connection, dis
 		bufferedWriter := buf.NewBufferedWriter(buf.NewWriter(conn))
 		responseWriter, err := WriteTCPResponse(request, bufferedWriter)
 		if err != nil {
-			return newError("failed to write response").Base(err)
+			return errors.New("failed to write response").Base(err)
 		}
 
 		{
@@ -257,7 +258,7 @@ func (s *Server) handleConnection(ctx context.Context, conn stat.Connection, dis
 		}
 
 		if err := buf.Copy(link.Reader, responseWriter, buf.UpdateActivity(timer)); err != nil {
-			return newError("failed to transport all TCP response").Base(err)
+			return errors.New("failed to transport all TCP response").Base(err)
 		}
 
 		return nil
@@ -267,7 +268,7 @@ func (s *Server) handleConnection(ctx context.Context, conn stat.Connection, dis
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)
 
 		if err := buf.Copy(bodyReader, link.Writer, buf.UpdateActivity(timer)); err != nil {
-			return newError("failed to transport all TCP request").Base(err)
+			return errors.New("failed to transport all TCP request").Base(err)
 		}
 
 		return nil
@@ -277,7 +278,7 @@ func (s *Server) handleConnection(ctx context.Context, conn stat.Connection, dis
 	if err := task.Run(ctx, requestDoneAndCloseWriter, responseDone); err != nil {
 		common.Interrupt(link.Reader)
 		common.Interrupt(link.Writer)
-		return newError("connection ends").Base(err)
+		return errors.New("connection ends").Base(err)
 	}
 
 	return nil

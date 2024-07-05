@@ -4,6 +4,7 @@ package outbound
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"strings"
 	"sync"
@@ -123,7 +124,7 @@ func (m *Manager) AddHandler(ctx context.Context, handler outbound.Handler) erro
 	tag := handler.Tag()
 	if len(tag) > 0 {
 		if _, found := m.taggedHandler[tag]; found {
-			return newError("existing tag found: " + tag)
+			return errors.New("existing tag found: " + tag)
 		}
 		m.taggedHandler[tag] = handler
 	} else {
@@ -150,7 +151,7 @@ func (m *Manager) GetAllHandlers(ctx context.Context) ([]outbound.Handler, error
 		}
 		return hs, nil
 	}
-	return nil, newError("no handler found")
+	return nil, errors.New("no handler found")
 }
 
 // RemoveHandler implements outbound.Manager.
@@ -168,9 +169,9 @@ func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
 			uh := m.untaggedHandlers
 			m.untaggedHandlers = append(uh[:t], uh[t+1:]...)
 		} else {
-			err := newError("handler #", t, ", index out of range").AtWarning()
-			err.WriteToLog()
-			return err
+			emsg := fmt.Sprintf("handler #%d index out of range", t)
+			errors.LogWarning(ctx, emsg)
+			return errors.New(emsg)
 		}
 	case string:
 		if h, ok := m.taggedHandler[t]; ok {

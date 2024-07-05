@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/xtls/xray-core/common"
+	"github.com/xtls/xray-core/common/errors"
 	cserial "github.com/xtls/xray-core/common/serial"
 	"github.com/xtls/xray-core/core"
 	"github.com/xtls/xray-core/features/dns"
@@ -48,7 +49,7 @@ func (r *Router) Init(ctx context.Context, config *Config, d dns.Client, ohm out
 func (r *Router) GetRoutingConfig() (*cserial.TypedMessage, error) {
 	tmsg := cserial.ToTypedMessage(r.config)
 	if tmsg == nil {
-		return nil, newError("config is null")
+		return nil, errors.New("config is null")
 	}
 	return tmsg, nil
 }
@@ -62,7 +63,7 @@ func (r *Router) SetRoutingConfig(config *cserial.TypedMessage) error {
 		r.Reload(c)
 		return nil
 	}
-	return newError("config type error")
+	return errors.New("config type error")
 }
 
 func (r *Router) Reload(config *Config) error {
@@ -93,7 +94,7 @@ func (r *Router) Reload(config *Config) error {
 		if len(btag) > 0 {
 			brule, found := balancers[btag]
 			if !found {
-				return newError("balancer ", btag, " not found")
+				return errors.New("balancer ", btag, " not found")
 			}
 			rr.Balancer = brule
 		}

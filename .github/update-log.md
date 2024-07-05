@@ -1,3 +1,7 @@
+#### exp #14
+更新xray-core至v1.8.16  
+修复windows下iperf3并发测速断流问题 Xray-core #3460  
+
 #### exp #13
 更新xray-core至v1.8.15  
 移除Mac arm系列发布文件，因为golang v1.21.4不支持新的Mac CPU  
