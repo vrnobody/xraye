@@ -1,6 +1,6 @@
 #### exp #14
-更新xray-core至v1.8.16  
-修复windows下iperf3并发测速断流问题 Xray-core #3460  
+更新xray-core至v1.8.16+ (commit e13f9f5)  
+修复windows下iperf3并发测速断流问题 Xray-core issue #3460  
 
 #### exp #13
 更新xray-core至v1.8.15  
