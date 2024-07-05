@@ -62,7 +62,7 @@ func (h *requestHandler) upsertSession(sessionId string) *httpSession {
 	}
 
 	s := &httpSession{
-		uploadQueue:      NewUploadQueue(int(2 * h.ln.config.GetNormalizedMaxConcurrentUploads())),
+		uploadQueue:      NewUploadQueue(int(h.ln.config.GetNormalizedMaxConcurrentUploads())),
 		isFullyConnected: done.New(),
 	}
 
@@ -136,10 +136,14 @@ func (h *requestHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			return
 		}
 
-		err = currentSession.uploadQueue.Push(Packet{
-			Payload: payload,
-			Seq:     seqInt,
-		})
+		err = currentSession.uploadQueue.Wait(seqInt)
+		if err != nil {
+			errors.LogInfoInner(context.Background(), err, "failed to upload")
+			writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		err = currentSession.uploadQueue.Push(seqInt, payload)
 
 		if err != nil {
 			errors.LogInfoInner(context.Background(), err, "failed to upload")
@@ -163,7 +167,7 @@ func (h *requestHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		writer.Header().Set("X-Accel-Buffering", "no")
 		// magic header to make the HTTP middle box consider this as SSE to disable buffer
 		writer.Header().Set("Content-Type", "text/event-stream")
-		
+
 		writer.WriteHeader(http.StatusOK)
 		// send a chunk immediately to enable CDN streaming.
 		// many CDN buffer the response headers until the origin starts sending
