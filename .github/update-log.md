@@ -1,7 +1,7 @@
 ### 和XTLS/xray-core的区别
 修复windows下iperf3并发测速断流问题 Xray-core issue #3460  
 去除routing相关的adrules/rmrules/sib命令  
-新增的在wiki中详细说明的各API功能  
+添加在wiki中详细说明的各API功能  
 
 ### 详细更新记录
 
