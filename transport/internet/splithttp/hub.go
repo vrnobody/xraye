@@ -32,7 +32,7 @@ type requestHandler struct {
 }
 
 type httpSession struct {
-	uploadQueue *UploadQueue
+	uploadQueue *uploadQueue
 	// for as long as the GET request is not opened by the client, this will be
 	// open ("undone"), and the session may be expired within a certain TTL.
 	// after the client connects, this becomes "done" and the session lives as
@@ -72,7 +72,7 @@ func (h *requestHandler) upsertSession(sessionId string) *httpSession {
 }
 
 func (h *requestHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	if len(h.host) > 0 && request.Host != h.host {
+	if len(h.host) > 0 && !internet.IsValidHTTPHost(request.Host, h.host) {
 		errors.LogInfo(context.Background(), "failed to validate host, request:", request.Host, ", config:", h.host)
 		writer.WriteHeader(http.StatusNotFound)
 		return

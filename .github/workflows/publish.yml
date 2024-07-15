@@ -14,7 +14,7 @@ on:
 
 jobs:
   prepare:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Restore Cache
         uses: actions/cache/restore@v4
@@ -65,15 +65,17 @@ jobs:
         # Include amd64 on all platforms.
         goos: [windows, freebsd, openbsd, linux, darwin]
         goarch: [amd64, 386]
+        gotoolchain: [""]
+        patch-assetname: [""]
+
         exclude:
           # Exclude i386 on darwin
           - goarch: 386
             goos: darwin
         include:
-          # BEIGIN MacOS ARM64
-          # golang v1.21.4 do not support new Mac CPU
-          # - goos: darwin
-          #  goarch: arm64
+          # BEGIN MacOS ARM64
+          - goos: darwin
+            goarch: arm64
           # END MacOS ARM64
           # BEGIN Linux ARM 5 6 7
           - goos: linux
@@ -140,9 +142,19 @@ jobs:
             goarch: arm
             goarm: 7
           # END OPENBSD ARM
+          # BEGIN Windows 7
+          - goos: windows
+            goarch: amd64
+            gotoolchain: 1.21.4
+            patch-assetname: win7-64
+          - goos: windows
+            goarch: 386
+            gotoolchain: 1.21.4
+            patch-assetname: win7-32
+          # END Windows 7
       fail-fast: false
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       GOOS: ${{ matrix.goos }}
       GOARCH: ${{ matrix.goarch }}
@@ -154,16 +166,17 @@ jobs:
         with:
           ref: main
 
-      - name: Show workflow information 
+      - name: Show workflow information
         run: |
-          export _NAME=$(jq ".[\"$GOOS-$GOARCH$GOARM$GOMIPS\"].friendlyName" -r < .github/build/friendly-filenames.json)
+          _NAME=${{ matrix.patch-assetname }}
+          [ -n "$_NAME" ] || _NAME=$(jq ".[\"$GOOS-$GOARCH$GOARM$GOMIPS\"].friendlyName" -r < .github/build/friendly-filenames.json)
           echo "GOOS: $GOOS, GOARCH: $GOARCH, GOARM: $GOARM, GOMIPS: $GOMIPS, RELEASE_NAME: $_NAME"
           echo "ASSET_NAME=$_NAME" >> $GITHUB_ENV
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          go-version: ${{ matrix.gotoolchain || '1.22' }}
           check-latest: true
 
       - name: Get project dependencies

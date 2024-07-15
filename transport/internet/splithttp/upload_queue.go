@@ -11,7 +11,7 @@ import (
 	"github.com/xtls/xray-core/common/errors"
 )
 
-type UploadQueue struct {
+type uploadQueue struct {
 	readSignalSize int
 	readSignal     chan struct{}
 
@@ -27,11 +27,11 @@ type UploadQueue struct {
 	closed bool
 }
 
-func NewUploadQueue(size int) *UploadQueue {
+func NewUploadQueue(size int) *uploadQueue {
 	writeMutex := sync.Mutex{}
 	bufferSize := uint64(2 * size)
 
-	return &UploadQueue{
+	return &uploadQueue{
 		readSignalSize: 3,
 		readSignal:     make(chan struct{}, 2*3),
 
@@ -48,7 +48,7 @@ func NewUploadQueue(size int) *UploadQueue {
 	}
 }
 
-func (h *UploadQueue) Push(seq uint64, payload []byte) error {
+func (h *uploadQueue) Push(seq uint64, payload []byte) error {
 	// notify reader
 	defer h.sendReadSignal()
 
@@ -59,7 +59,7 @@ func (h *UploadQueue) Push(seq uint64, payload []byte) error {
 }
 
 // Wait until buffer is available
-func (h *UploadQueue) Wait(seq uint64) error {
+func (h *uploadQueue) Wait(seq uint64) error {
 	// fast path
 	if seq < h.seq+h.bufferSize {
 		if h.closed {
@@ -88,21 +88,21 @@ func (h *UploadQueue) Wait(seq uint64) error {
 	return nil
 }
 
-func (h *UploadQueue) Close() error {
+func (h *uploadQueue) Close() error {
 	h.closed = true
 	h.writeSignal.Broadcast()
 	h.sendReadSignal()
 	return nil
 }
 
-func (h *UploadQueue) sendReadSignal() {
+func (h *uploadQueue) sendReadSignal() {
 	// non-blocking (kind of)
 	if len(h.readSignal) < h.readSignalSize {
 		h.readSignal <- struct{}{}
 	}
 }
 
-func (h *UploadQueue) Read(b []byte) (int, error) {
+func (h *uploadQueue) Read(b []byte) (int, error) {
 	for {
 		// try to read from cache
 		if l := len(h.cache); l > 0 {

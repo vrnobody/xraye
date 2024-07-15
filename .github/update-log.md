@@ -1,3 +1,15 @@
+### 和XTLS/xray-core的区别
+修复windows下iperf3并发测速断流问题 Xray-core issue #3460  
+去除routing相关的adrules/rmrules/sib命令  
+新增的在wiki中详细说明的各API功能  
+
+### 详细更新记录
+
+#### exp #15
+更新xray-core至v1.8.17 (commit 558cfcc)  
+添加单独的win7发布文件  
+加回Mac arm系列发布文件  
+
 #### exp #14
 更新xray-core至v1.8.16+ (commit e13f9f5)  
 修复windows下iperf3并发测速断流问题 Xray-core issue #3460  
