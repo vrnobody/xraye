@@ -63,7 +63,9 @@ func Test_listenSHAndDial(t *testing.T) {
 	}
 
 	common.Must(conn.Close())
-	<-time.After(time.Second * 5)
+
+	// <-time.After(time.Second * 5)
+
 	conn, err = Dial(ctx, net.TCPDestination(net.DomainAddress("localhost"), listenPort), streamSettings)
 	common.Must(err)
 	_, err = conn.Write([]byte("Test connection 2"))
