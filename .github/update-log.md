@@ -5,6 +5,9 @@
 
 ### 详细更新记录
 
+#### exp #16
+更新xray-core至v1.8.19 (commit b277bac)  
+
 #### exp #15
 更新xray-core至v1.8.17 (commit 558cfcc)  
 添加单独的win7发布文件  

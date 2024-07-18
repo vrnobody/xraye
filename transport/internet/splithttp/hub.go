@@ -57,7 +57,6 @@ func (h *requestHandler) maybeReapSession(isFullyConnected *done.Instance, sessi
 }
 
 func (h *requestHandler) upsertSession(sessionId string) *httpSession {
-
 	// fast path
 	currentSessionAny, ok := h.sessions.Load(sessionId)
 	if ok {
