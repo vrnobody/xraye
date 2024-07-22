@@ -1,9 +1,12 @@
 ### 和XTLS/xray-core的区别
-修复windows下iperf3并发测速断流问题 Xray-core issue #3460  
+修复windows下iperf3并发测速断流问题（XTLS/Xray-core issue [#3460](https://github.com/XTLS/Xray-core/issues/3460)）  
 去除routing相关的adrules/rmrules/sib命令  
-添加多个API功能（[详见wiki](https://github.com/vrnobody/xraye/wiki)）  
+添加多个API功能，详见[wiki](https://github.com/vrnobody/xraye/wiki)  
 
 ### 详细更新记录
+
+#### exp #18
+更新xray-core至v1.8.21 (commit c27d652)  
 
 #### exp #17
 更新xray-core至v1.8.20 (commit 8deb953)  
