@@ -39,7 +39,7 @@ func executeGetRoutingConfig(cmd *base.Command, args []string) {
 	if err != nil {
 		base.Fatalf("failed to get routing config: %s", err)
 	}
-	if j, ok := creflect.MarshalToJson(resp.Config); !ok {
+	if j, ok := creflect.MarshalToJson(resp.Config, true); !ok {
 		base.Fatalf("failed to marshal configs to json")
 	} else {
 		fmt.Print(j)

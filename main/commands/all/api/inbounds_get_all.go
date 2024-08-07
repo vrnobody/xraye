@@ -39,7 +39,7 @@ func executeGetAllInbounds(cmd *base.Command, args []string) {
 	if err != nil {
 		base.Fatalf("failed to get inbounds config: %s", err)
 	}
-	if j, ok := creflect.MarshalToJson(resp.Configs); !ok {
+	if j, ok := creflect.MarshalToJson(resp.Configs, true); !ok {
 		base.Fatalf("failed to marshal configs to json")
 	} else {
 		fmt.Print(j)
