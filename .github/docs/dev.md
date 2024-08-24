@@ -29,10 +29,15 @@ git merge <branch-for-revert>
 ```
 
 #### protobuf
-如果需要修改 protobuf，例如增加新配置项，请运行：go generate core/proto.go  
-安装protoc
 ```bash
+# 安装protoc
 go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+
+# 更新单个 proto
+go generate core/proto.go  
+
+# 更新全部 proto
+go run ./infra/vprotogen/main.go -pwd .
 ```
 

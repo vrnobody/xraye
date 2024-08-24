@@ -5,6 +5,9 @@
 
 ### 详细更新记录
 
+#### exp #19
+更新xray-core至v1.8.23 (commit c0c23fd)  
+
 #### exp #18
 更新xray-core至v1.8.21 (commit c27d652)  
 

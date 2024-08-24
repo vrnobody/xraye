@@ -24,10 +24,10 @@ import (
 	vmessin "github.com/xtls/xray-core/proxy/vmess/inbound"
 
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/xtls/xray-core/common/buf"
 	"github.com/xtls/xray-core/main/commands/base"
+	creflect "github.com/xtls/xray-core/common/reflect"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 )
@@ -118,20 +118,16 @@ func fetchHTTPContent(target string) ([]byte, error) {
 	return content, nil
 }
 
-func protoToJSONString(m proto.Message, prefix, indent string) (string, error) {
-	return strings.TrimSpace(protojson.MarshalOptions{Indent: indent}.Format(m)), nil
-}
-
 func showJSONResponse(m proto.Message) {
 	if isNil(m) {
 		return
 	}
-	output, err := protoToJSONString(m, "", "    ")
-	if err != nil {
+	if j, ok := creflect.MarshalToJson(m, true); ok {
+		fmt.Println(j)
+	} else {
 		fmt.Fprintf(os.Stdout, "%v\n", m)
-		base.Fatalf("error encode json: %s", err)
+		base.Fatalf("error encode json")
 	}
-	fmt.Println(output)
 }
 
 func isNil(i interface{}) bool {
