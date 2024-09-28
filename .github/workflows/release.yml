@@ -172,7 +172,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.gotoolchain || '1.22' }}
+          go-version: ${{ matrix.gotoolchain || '1.23' }}
           check-latest: true
           cache: false
 

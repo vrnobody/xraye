@@ -9,8 +9,6 @@
 // connections.
 package core
 
-//go:generate go run github.com/xtls/xray-core/common/errors/errorgen
-
 import (
 	"fmt"
 	"runtime"
@@ -19,14 +17,14 @@ import (
 )
 
 var (
-	Version_x byte = 1
-	Version_y byte = 8
-	Version_z byte = 23
+	Version_x byte = 24
+	Version_y byte = 9
+	Version_z byte = 19
 )
 
 var (
 	build    = "Custom"
-	expWarn  = "Experimental #19"
+	expWarn  = "Experimental #20"
 	codename = "Xray, Penetrates Everything."
 	intro    = "A unified platform for anti-censorship."
 )

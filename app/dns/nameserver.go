@@ -62,7 +62,7 @@ func NewServer(dest net.Destination, dispatcher routing.Dispatcher, queryStrateg
 		dest.Network = net.Network_UDP
 	}
 	if dest.Network == net.Network_UDP { // UDP classic DNS mode
-		return NewClassicNameServer(dest, dispatcher), nil
+		return NewClassicNameServer(dest, dispatcher, queryStrategy), nil
 	}
 	return nil, errors.New("No available name server could be created from ", dest).AtWarning()
 }
@@ -160,31 +160,6 @@ func NewClient(
 		client.expectIPs = matchers
 		return nil
 	})
-	return client, err
-}
-
-// NewSimpleClient creates a DNS client with a simple destination.
-func NewSimpleClient(ctx context.Context, endpoint *net.Endpoint, clientIP net.IP) (*Client, error) {
-	client := &Client{}
-	err := core.RequireFeatures(ctx, func(dispatcher routing.Dispatcher) error {
-		server, err := NewServer(endpoint.AsDestination(), dispatcher, QueryStrategy_USE_IP)
-		if err != nil {
-			return errors.New("failed to create nameserver").Base(err).AtWarning()
-		}
-		client.server = server
-		client.clientIP = clientIP
-		return nil
-	})
-
-	if len(clientIP) > 0 {
-		switch endpoint.Address.GetAddress().(type) {
-		case *net.IPOrDomain_Domain:
-			errors.LogInfo(ctx, "DNS: client ", endpoint.Address.GetDomain(), " uses clientIP ", clientIP.String())
-		case *net.IPOrDomain_Ip:
-			errors.LogInfo(ctx, "DNS: client ", endpoint.Address.GetIp(), " uses clientIP ", clientIP.String())
-		}
-	}
-
 	return client, err
 }
 

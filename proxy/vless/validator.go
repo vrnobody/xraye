@@ -10,8 +10,15 @@ import (
 	"github.com/xtls/xray-core/common/uuid"
 )
 
-// Validator stores valid VLESS users.
-type Validator struct {
+type Validator interface {
+	Get(id uuid.UUID) *protocol.MemoryUser
+	Add(u *protocol.MemoryUser) error
+	Del(email string) error
+	GetAll() ([]string, bool)
+}
+
+// MemoryValidator stores valid VLESS users.
+type MemoryValidator struct {
 	// Considering email's usage here, map + sync.Mutex/RWMutex may have better performance.
 	email sync.Map
 	users sync.Map
@@ -20,7 +27,7 @@ type Validator struct {
 }
 
 // Add a VLESS user, Email must be empty or unique.
-func (v *Validator) Add(u *protocol.MemoryUser) error {
+func (v *MemoryValidator) Add(u *protocol.MemoryUser) error {
 	if u.Email != "" {
 		_, loaded := v.email.LoadOrStore(strings.ToLower(u.Email), u)
 		if loaded {
@@ -32,7 +39,7 @@ func (v *Validator) Add(u *protocol.MemoryUser) error {
 }
 
 // Del a VLESS user with a non-empty Email.
-func (v *Validator) Del(e string) error {
+func (v *MemoryValidator) Del(e string) error {
 	if e == "" {
 		return errors.New("Email must not be empty.")
 	}
@@ -49,7 +56,7 @@ func (v *Validator) Del(e string) error {
 }
 
 // GetAll users info.
-func (v *Validator) GetAll() ([]string, bool) {
+func (v *MemoryValidator) GetAll() ([]string, bool) {
 	type info struct {
 		Id    string
 		Flow  string
@@ -93,7 +100,7 @@ func (v *Validator) GetAll() ([]string, bool) {
 }
 
 // Get a VLESS user with UUID, nil if user doesn't exist.
-func (v *Validator) Get(id uuid.UUID) *protocol.MemoryUser {
+func (v *MemoryValidator) Get(id uuid.UUID) *protocol.MemoryUser {
 	u, _ := v.users.Load(id)
 	if u != nil {
 		return u.(*protocol.MemoryUser)
