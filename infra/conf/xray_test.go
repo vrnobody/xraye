@@ -233,7 +233,6 @@ func TestConfig_Override(t *testing.T) {
 				Policy:       &PolicyConfig{},
 				API:          &APIConfig{},
 				Stats:        &StatsConfig{},
-				Reverse:      &ReverseConfig{},
 			},
 			"",
 			&Config{
@@ -243,7 +242,6 @@ func TestConfig_Override(t *testing.T) {
 				Policy:       &PolicyConfig{},
 				API:          &APIConfig{},
 				Stats:        &StatsConfig{},
-				Reverse:      &ReverseConfig{},
 			},
 		},
 		{
