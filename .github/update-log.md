@@ -1,12 +1,20 @@
 ### 和XTLS/xray-core的区别
-修复windows下iperf3并发测速断流问题（XTLS/Xray-core issue [#3460](https://github.com/XTLS/Xray-core/issues/3460)）  
-去除routing相关的adrules/rmrules/sib命令  
 添加多个API功能，详见[wiki](https://github.com/vrnobody/xraye/wiki)  
+移除wireguard相关协议  
+移除shadowsocks相关协议  
+移除reverse功能  
+移除yaml/toml配置格式，只支持json配置格式  
+移除routing相关的adrules/rmrules/sib命令（和现有命令冲突）  
+修复windows下iperf3并发测速断流问题（XTLS/Xray-core issue [#3460](https://github.com/XTLS/Xray-core/issues/3460)）  
 
 ### 详细更新记录
 
 #### exp #20
-更新xray-core至v24.9.19 (commit 3632e83)
+更新xray-core至v24.9.19 (commit 3632e83)  
+移除wireguard相关协议  
+移除shadowsocks相关协议  
+移除reverse功能  
+exe文件从26MiB减少到21MiB  
 
 #### exp #19
 更新xray-core至v1.8.23 (commit c0c23fd)  

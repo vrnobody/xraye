@@ -6,37 +6,29 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xtls/xray-core/common/protocol"
 	. "github.com/xtls/xray-core/common/reflect"
+	"github.com/xtls/xray-core/common/uuid"
 	cserial "github.com/xtls/xray-core/common/serial"
 	iserial "github.com/xtls/xray-core/infra/conf/serial"
-	"github.com/xtls/xray-core/proxy/shadowsocks"
+	"github.com/xtls/xray-core/proxy/vmess"
 )
 
 func TestMashalAccount(t *testing.T) {
-	account := &shadowsocks.Account{
-		Password:   "shadowsocks-password",
-		CipherType: shadowsocks.CipherType_CHACHA20_POLY1305,
+	uuid := uuid.New()
+	
+	account := &vmess.Account{
+		Id: uuid.String(),
 	}
 
-	user := &protocol.User{
-		Level:   0,
-		Email:   "love@v2ray.com",
-		Account: cserial.ToTypedMessage(account),
-	}
-
-	j, ok := MarshalToJson(user, false)
+	j, ok := MarshalToJson(account, false)
 	if !ok || strings.Contains(j, "_TypedMessage_") {
-
 		t.Error("marshal account failed")
 	}
 
-	kws := []string{"CHACHA20_POLY1305", "cipherType", "shadowsocks-password"}
-	for _, kw := range kws {
-		if !strings.Contains(j, kw) {
-			t.Error("marshal account failed")
-		}
+	if !strings.Contains(j, uuid.String()) {
+		t.Error("marshal account failed")
 	}
+	
 	// t.Log(j)
 }
 
