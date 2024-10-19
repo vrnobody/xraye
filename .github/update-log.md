@@ -9,6 +9,9 @@
 
 ### 详细更新记录
 
+#### exp #21
+更新xray-core至v24.10.16 (commit e4939dc)  
+
 #### exp #20
 更新xray-core至v24.9.19 (commit 3632e83)  
 移除wireguard相关协议  
