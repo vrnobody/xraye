@@ -58,7 +58,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-12]
+        # 高贵的 mac 系统，，，滚！
+        # os: [windows-latest, ubuntu-latest, macos-12]
+        os: [windows-latest, ubuntu-latest]
     steps:
       - name: Checkout codebase
         uses: actions/checkout@v4
