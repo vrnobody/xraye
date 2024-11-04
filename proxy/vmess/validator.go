@@ -3,8 +3,6 @@ package vmess
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"encoding/json"
-
 	"hash/crc64"
 	"strings"
 	"sync"
@@ -24,8 +22,6 @@ type TimedUserValidator struct {
 	behaviorFused bool
 
 	aeadDecoderHolder *aead.AuthIDDecoderHolder
-
-	userInfoCache sync.Map
 }
 
 // NewTimedUserValidator creates a new TimedUserValidator.
@@ -35,48 +31,6 @@ func NewTimedUserValidator() *TimedUserValidator {
 		aeadDecoderHolder: aead.NewAuthIDDecoderHolder(),
 	}
 	return tuv
-}
-
-// GetAll users info.
-func (v *TimedUserValidator) GetAll() ([]string, bool) {
-	v.Lock()
-	defer v.Unlock()
-
-	type info struct {
-		Id       string
-		Security string
-		Email    string
-		Level    uint32
-	}
-
-	users := make([]string, 0)
-	for _, mu := range v.users {
-		if o, ok := v.userInfoCache.Load(mu); ok {
-			if o == nil {
-				continue
-			}
-			if user, ok := o.(string); ok {
-				users = append(users, user)
-				continue
-			}
-		}
-		if ma, ok := mu.Account.(*MemoryAccount); ok {
-			info := &info{
-				Id:       ma.ID.String(),
-				Security: ma.Security.String(),
-				Email:    mu.Email,
-				Level:    mu.Level,
-			}
-			if j, err := json.MarshalIndent(info, "", "  "); err == nil {
-				user := string(j)
-				users = append(users, user)
-				v.userInfoCache.Store(mu, user)
-				continue
-			}
-		}
-		v.userInfoCache.Store(mu, nil)
-	}
-	return users, true
 }
 
 func (v *TimedUserValidator) Add(u *protocol.MemoryUser) error {
@@ -100,6 +54,20 @@ func (v *TimedUserValidator) Add(u *protocol.MemoryUser) error {
 	v.aeadDecoderHolder.AddUser(cmdkeyfl, u)
 
 	return nil
+}
+
+func (v *TimedUserValidator) GetUsers() []*protocol.MemoryUser {
+	v.Lock()
+	defer v.Unlock()
+	dst := make([]*protocol.MemoryUser, len(v.users))
+	copy(dst, v.users)
+	return dst
+}
+
+func (v *TimedUserValidator) GetCount() int64 {
+	v.Lock()
+	defer v.Unlock()
+	return int64(len(v.users))
 }
 
 func (v *TimedUserValidator) GetAEAD(userHash []byte) (*protocol.MemoryUser, bool, error) {
@@ -134,9 +102,8 @@ func (v *TimedUserValidator) Remove(email string) bool {
 	if idx == -1 {
 		return false
 	}
-
-	v.userInfoCache.Delete(v.users[idx])
 	ulen := len(v.users)
+
 	v.users[idx] = v.users[ulen-1]
 	v.users[ulen-1] = nil
 	v.users = v.users[:ulen-1]

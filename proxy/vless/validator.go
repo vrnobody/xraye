@@ -1,7 +1,6 @@
 package vless
 
 import (
-	"encoding/json"
 	"strings"
 	"sync"
 
@@ -14,7 +13,9 @@ type Validator interface {
 	Get(id uuid.UUID) *protocol.MemoryUser
 	Add(u *protocol.MemoryUser) error
 	Del(email string) error
-	GetAll() ([]string, bool)
+	GetByEmail(email string) *protocol.MemoryUser
+	GetAll() []*protocol.MemoryUser
+	GetCount() int64
 }
 
 // MemoryValidator stores valid VLESS users.
@@ -22,8 +23,6 @@ type MemoryValidator struct {
 	// Considering email's usage here, map + sync.Mutex/RWMutex may have better performance.
 	email sync.Map
 	users sync.Map
-
-	userInfoCache sync.Map
 }
 
 // Add a VLESS user, Email must be empty or unique.
@@ -48,55 +47,9 @@ func (v *MemoryValidator) Del(e string) error {
 	if u == nil {
 		return errors.New("User ", e, " not found.")
 	}
-	mu := u.(*protocol.MemoryUser)
-	v.userInfoCache.Delete(mu)
 	v.email.Delete(le)
-	v.users.Delete(mu.Account.(*MemoryAccount).ID.UUID())
+	v.users.Delete(u.(*protocol.MemoryUser).Account.(*MemoryAccount).ID.UUID())
 	return nil
-}
-
-// GetAll users info.
-func (v *MemoryValidator) GetAll() ([]string, bool) {
-	type info struct {
-		Id    string
-		Flow  string
-		Email string
-		Level uint32
-	}
-
-	users := make([]string, 0)
-	v.users.Range(func(_, value interface{}) bool {
-		mu, ok := value.(*protocol.MemoryUser)
-		if !ok {
-			return true
-		}
-		if o, ok := v.userInfoCache.Load(mu); ok {
-			if o == nil {
-				return true
-			}
-			if user, ok := o.(string); ok {
-				users = append(users, user)
-				return true
-			}
-		}
-		if ma, ok := mu.Account.(*MemoryAccount); ok {
-			info := &info{
-				Id:    ma.ID.String(),
-				Flow:  ma.Flow,
-				Email: mu.Email,
-				Level: mu.Level,
-			}
-			if j, err := json.MarshalIndent(info, "", "  "); err == nil {
-				user := string(j)
-				users = append(users, user)
-				v.userInfoCache.Store(mu, user)
-				return true
-			}
-		}
-		v.userInfoCache.Store(mu, nil)
-		return true
-	})
-	return users, true
 }
 
 // Get a VLESS user with UUID, nil if user doesn't exist.
@@ -106,4 +59,33 @@ func (v *MemoryValidator) Get(id uuid.UUID) *protocol.MemoryUser {
 		return u.(*protocol.MemoryUser)
 	}
 	return nil
+}
+
+// Get a VLESS user with email, nil if user doesn't exist.
+func (v *MemoryValidator) GetByEmail(email string) *protocol.MemoryUser {
+	u, _ := v.email.Load(email)
+	if u != nil {
+		return u.(*protocol.MemoryUser)
+	}
+	return nil
+}
+
+// Get all users
+func (v *MemoryValidator) GetAll() []*protocol.MemoryUser {
+	var u = make([]*protocol.MemoryUser, 0, 100)
+	v.email.Range(func(key, value interface{}) bool {
+		u = append(u, value.(*protocol.MemoryUser))
+		return true
+	})
+	return u
+}
+
+// Get users count
+func (v *MemoryValidator) GetCount() int64 {
+	var c int64 = 0
+	v.email.Range(func(key, value interface{}) bool {
+		c++
+		return true
+	})
+	return c
 }

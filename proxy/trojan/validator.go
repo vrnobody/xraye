@@ -1,7 +1,6 @@
 package trojan
 
 import (
-	"encoding/json"
 	"strings"
 	"sync"
 
@@ -12,9 +11,8 @@ import (
 // Validator stores valid trojan users.
 type Validator struct {
 	// Considering email's usage here, map + sync.Mutex/RWMutex may have better performance.
-	email         sync.Map
-	users         sync.Map
-	userInfoCache sync.Map
+	email sync.Map
+	users sync.Map
 }
 
 // Add a trojan user, Email must be empty or unique.
@@ -39,10 +37,8 @@ func (v *Validator) Del(e string) error {
 	if u == nil {
 		return errors.New("User ", e, " not found.")
 	}
-	mu := u.(*protocol.MemoryUser)
-	v.userInfoCache.Delete(mu)
 	v.email.Delete(le)
-	v.users.Delete(hexString(mu.Account.(*MemoryAccount).Key))
+	v.users.Delete(hexString(u.(*protocol.MemoryUser).Account.(*MemoryAccount).Key))
 	return nil
 }
 
@@ -55,44 +51,32 @@ func (v *Validator) Get(hash string) *protocol.MemoryUser {
 	return nil
 }
 
-// GetAll users info.
-func (v *Validator) GetAll() ([]string, bool) {
-	type info struct {
-		Password string
-		Email    string
-		Level    uint32
-	}
 
-	users := make([]string, 0)
-	v.users.Range(func(_, value interface{}) bool {
-		mu, ok := value.(*protocol.MemoryUser)
-		if !ok {
-			return true
-		}
-		if o, ok := v.userInfoCache.Load(mu); ok {
-			if o == nil {
-				return true
-			}
-			if user, ok := o.(string); ok {
-				users = append(users, user)
-				return true
-			}
-		}
-		if ma, ok := mu.Account.(*MemoryAccount); ok {
-			info := &info{
-				Password: ma.Password,
-				Email:    mu.Email,
-				Level:    mu.Level,
-			}
-			if j, err := json.MarshalIndent(info, "", "  "); err == nil {
-				user := string(j)
-				users = append(users, user)
-				v.userInfoCache.Store(mu, user)
-				return true
-			}
-		}
-		v.userInfoCache.Store(mu, nil)
+// Get a trojan user with hashed key, nil if user doesn't exist.
+func (v *Validator) GetByEmail(email string) *protocol.MemoryUser {
+	u, _ := v.email.Load(email)
+	if u != nil {
+		return u.(*protocol.MemoryUser)
+	}
+	return nil
+}
+
+// Get all users
+func (v *Validator) GetAll() []*protocol.MemoryUser {
+	var u = make([]*protocol.MemoryUser, 0, 100)
+	v.email.Range(func(key, value interface{}) bool {
+		u = append(u, value.(*protocol.MemoryUser))
 		return true
 	})
-	return users, true
+	return u
+}
+
+// Get users count
+func (v *Validator) GetCount() int64 {
+	var c int64 = 0
+	v.email.Range(func(key, value interface{}) bool {
+		c++
+		return true
+	})
+	return c
 }

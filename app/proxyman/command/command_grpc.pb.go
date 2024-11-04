@@ -26,7 +26,8 @@ type HandlerServiceClient interface {
 	AddInbound(ctx context.Context, in *AddInboundRequest, opts ...grpc.CallOption) (*AddInboundResponse, error)
 	RemoveInbound(ctx context.Context, in *RemoveInboundRequest, opts ...grpc.CallOption) (*RemoveInboundResponse, error)
 	AlterInbound(ctx context.Context, in *AlterInboundRequest, opts ...grpc.CallOption) (*AlterInboundResponse, error)
-	QueryInbound(ctx context.Context, in *QueryInboundRequest, opts ...grpc.CallOption) (*QueryInboundResponse, error)
+	GetInboundUsers(ctx context.Context, in *GetInboundUserRequest, opts ...grpc.CallOption) (*GetInboundUserResponse, error)
+	GetInboundUsersCount(ctx context.Context, in *GetInboundUserRequest, opts ...grpc.CallOption) (*GetInboundUsersCountResponse, error)
 	GetAllOutbounds(ctx context.Context, in *GetAllOutboundsRequest, opts ...grpc.CallOption) (*GetAllOutboundsResponse, error)
 	AddOutbound(ctx context.Context, in *AddOutboundRequest, opts ...grpc.CallOption) (*AddOutboundResponse, error)
 	RemoveOutbound(ctx context.Context, in *RemoveOutboundRequest, opts ...grpc.CallOption) (*RemoveOutboundResponse, error)
@@ -77,9 +78,18 @@ func (c *handlerServiceClient) AlterInbound(ctx context.Context, in *AlterInboun
 	return out, nil
 }
 
-func (c *handlerServiceClient) QueryInbound(ctx context.Context, in *QueryInboundRequest, opts ...grpc.CallOption) (*QueryInboundResponse, error) {
-	out := new(QueryInboundResponse)
-	err := c.cc.Invoke(ctx, "/xray.app.proxyman.command.HandlerService/QueryInbound", in, out, opts...)
+func (c *handlerServiceClient) GetInboundUsers(ctx context.Context, in *GetInboundUserRequest, opts ...grpc.CallOption) (*GetInboundUserResponse, error) {
+	out := new(GetInboundUserResponse)
+	err := c.cc.Invoke(ctx, "/xray.app.proxyman.command.HandlerService/GetInboundUsers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *handlerServiceClient) GetInboundUsersCount(ctx context.Context, in *GetInboundUserRequest, opts ...grpc.CallOption) (*GetInboundUsersCountResponse, error) {
+	out := new(GetInboundUsersCountResponse)
+	err := c.cc.Invoke(ctx, "/xray.app.proxyman.command.HandlerService/GetInboundUsersCount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +140,8 @@ type HandlerServiceServer interface {
 	AddInbound(context.Context, *AddInboundRequest) (*AddInboundResponse, error)
 	RemoveInbound(context.Context, *RemoveInboundRequest) (*RemoveInboundResponse, error)
 	AlterInbound(context.Context, *AlterInboundRequest) (*AlterInboundResponse, error)
-	QueryInbound(context.Context, *QueryInboundRequest) (*QueryInboundResponse, error)
+	GetInboundUsers(context.Context, *GetInboundUserRequest) (*GetInboundUserResponse, error)
+	GetInboundUsersCount(context.Context, *GetInboundUserRequest) (*GetInboundUsersCountResponse, error)
 	GetAllOutbounds(context.Context, *GetAllOutboundsRequest) (*GetAllOutboundsResponse, error)
 	AddOutbound(context.Context, *AddOutboundRequest) (*AddOutboundResponse, error)
 	RemoveOutbound(context.Context, *RemoveOutboundRequest) (*RemoveOutboundResponse, error)
@@ -154,8 +165,11 @@ func (UnimplementedHandlerServiceServer) RemoveInbound(context.Context, *RemoveI
 func (UnimplementedHandlerServiceServer) AlterInbound(context.Context, *AlterInboundRequest) (*AlterInboundResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AlterInbound not implemented")
 }
-func (UnimplementedHandlerServiceServer) QueryInbound(context.Context, *QueryInboundRequest) (*QueryInboundResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method QueryInbound not implemented")
+func (UnimplementedHandlerServiceServer) GetInboundUsers(context.Context, *GetInboundUserRequest) (*GetInboundUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetInboundUsers not implemented")
+}
+func (UnimplementedHandlerServiceServer) GetInboundUsersCount(context.Context, *GetInboundUserRequest) (*GetInboundUsersCountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetInboundUsersCount not implemented")
 }
 func (UnimplementedHandlerServiceServer) GetAllOutbounds(context.Context, *GetAllOutboundsRequest) (*GetAllOutboundsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllOutbounds not implemented")
@@ -254,20 +268,38 @@ func _HandlerService_AlterInbound_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _HandlerService_QueryInbound_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryInboundRequest)
+func _HandlerService_GetInboundUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInboundUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(HandlerServiceServer).QueryInbound(ctx, in)
+		return srv.(HandlerServiceServer).GetInboundUsers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/xray.app.proxyman.command.HandlerService/QueryInbound",
+		FullMethod: "/xray.app.proxyman.command.HandlerService/GetInboundUsers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HandlerServiceServer).QueryInbound(ctx, req.(*QueryInboundRequest))
+		return srv.(HandlerServiceServer).GetInboundUsers(ctx, req.(*GetInboundUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HandlerService_GetInboundUsersCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInboundUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HandlerServiceServer).GetInboundUsersCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/xray.app.proxyman.command.HandlerService/GetInboundUsersCount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HandlerServiceServer).GetInboundUsersCount(ctx, req.(*GetInboundUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -368,8 +400,12 @@ var HandlerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _HandlerService_AlterInbound_Handler,
 		},
 		{
-			MethodName: "QueryInbound",
-			Handler:    _HandlerService_QueryInbound_Handler,
+			MethodName: "GetInboundUsers",
+			Handler:    _HandlerService_GetInboundUsers_Handler,
+		},
+		{
+			MethodName: "GetInboundUsersCount",
+			Handler:    _HandlerService_GetInboundUsersCount_Handler,
 		},
 		{
 			MethodName: "GetAllOutbounds",

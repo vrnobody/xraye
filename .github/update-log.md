@@ -9,6 +9,10 @@
 
 ### 详细更新记录
 
+#### exp #22
+更新xray-core至v24.10.31 (commit 2c72864)  
+删除getu(查询inbound用户)命令（因为xray-core新增了相关命令）  
+
 #### exp #21
 更新xray-core至v24.10.16 (commit e4939dc)  
 

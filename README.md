@@ -17,7 +17,6 @@ rmi           增加删除tag为空的inbound功能
 rmo           增加删除tag为空的outbound功能
 getr          获取routing配置，以json格式输出
 setr          替换routing配置
-getu          获取inbound的用户信息，只支持vmess, vless, trojan三种协议
 adu           向inbounds添加用户
 rmu           从inbounds删除用户
 ```

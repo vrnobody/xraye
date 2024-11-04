@@ -81,18 +81,6 @@ func New(ctx context.Context, config *Config, dc dns.Client, validator vless.Val
 		validator:             validator,
 	}
 
-	var _ proxy.UserManager = handler
-
-	for _, user := range config.Clients {
-		u, err := user.ToMemoryUser()
-		if err != nil {
-			return nil, errors.New("failed to get VLESS user").Base(err).AtError()
-		}
-		if err := handler.AddUser(ctx, u); err != nil {
-			return nil, errors.New("failed to initiate user").Base(err).AtError()
-		}
-	}
-
 	if config.Fallbacks != nil {
 		handler.fallbacks = make(map[string]map[string]map[string]*Fallback)
 		// handler.regexps = make(map[string]*regexp.Regexp)
@@ -184,9 +172,19 @@ func (h *Handler) RemoveUser(ctx context.Context, e string) error {
 	return h.validator.Del(e)
 }
 
+// GetUser implements proxy.UserManager.GetUser().
+func (h *Handler) GetUser(ctx context.Context, email string) *protocol.MemoryUser {
+	return h.validator.GetByEmail(email)
+}
+
 // GetUsers implements proxy.UserManager.GetUsers().
-func (h *Handler) GetUsers(ctx context.Context) ([]string, bool) {
+func (h *Handler) GetUsers(ctx context.Context) []*protocol.MemoryUser {
 	return h.validator.GetAll()
+}
+
+// GetUsersCount implements proxy.UserManager.GetUsersCount().
+func (h *Handler) GetUsersCount(context.Context) int64 {
+	return h.validator.GetCount()
 }
 
 // Network implements proxy.Inbound.Network().

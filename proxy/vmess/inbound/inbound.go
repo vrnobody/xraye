@@ -21,7 +21,6 @@ import (
 	feature_inbound "github.com/xtls/xray-core/features/inbound"
 	"github.com/xtls/xray-core/features/policy"
 	"github.com/xtls/xray-core/features/routing"
-	"github.com/xtls/xray-core/proxy"
 	"github.com/xtls/xray-core/proxy/vmess"
 	"github.com/xtls/xray-core/proxy/vmess/encoding"
 	"github.com/xtls/xray-core/transport/internet/stat"
@@ -57,7 +56,7 @@ func (v *userByEmail) Add(u *protocol.MemoryUser) bool {
 	return v.addNoLock(u)
 }
 
-func (v *userByEmail) Get(email string) (*protocol.MemoryUser, bool) {
+func (v *userByEmail) GetOrGenerate(email string) (*protocol.MemoryUser, bool) {
 	email = strings.ToLower(email)
 
 	v.Lock()
@@ -79,6 +78,13 @@ func (v *userByEmail) Get(email string) (*protocol.MemoryUser, bool) {
 		v.cache[email] = user
 	}
 	return user, found
+}
+
+func (v *userByEmail) Get(email string) *protocol.MemoryUser {
+	email = strings.ToLower(email)
+	v.Lock()
+	defer v.Unlock()
+	return v.cache[email]
 }
 
 func (v *userByEmail) Remove(email string) bool {
@@ -116,8 +122,6 @@ func New(ctx context.Context, config *Config) (*Handler, error) {
 		sessionHistory:        encoding.NewSessionHistory(),
 	}
 
-	var _ proxy.UserManager = handler
-
 	for _, user := range config.User {
 		mUser, err := user.ToMemoryUser()
 		if err != nil {
@@ -144,16 +148,24 @@ func (*Handler) Network() []net.Network {
 	return []net.Network{net.Network_TCP, net.Network_UNIX}
 }
 
-func (h *Handler) GetUser(email string) *protocol.MemoryUser {
-	user, existing := h.usersByEmail.Get(email)
+func (h *Handler) GetOrGenerateUser(email string) *protocol.MemoryUser {
+	user, existing := h.usersByEmail.GetOrGenerate(email)
 	if !existing {
 		h.clients.Add(user)
 	}
 	return user
 }
 
-func (h *Handler) GetUsers(ctx context.Context) ([]string, bool) {
-	return h.clients.GetAll()
+func (h *Handler) GetUser(ctx context.Context, email string) *protocol.MemoryUser {
+	return h.usersByEmail.Get(email)
+}
+
+func (h *Handler) GetUsers(ctx context.Context) []*protocol.MemoryUser {
+	return h.clients.GetUsers()
+}
+
+func (h *Handler) GetUsersCount(context.Context) int64 {
+	return h.clients.GetCount()
 }
 
 func (h *Handler) AddUser(ctx context.Context, user *protocol.MemoryUser) error {
@@ -328,7 +340,7 @@ func (h *Handler) generateCommand(ctx context.Context, request *protocol.Request
 				}
 
 				errors.LogDebug(ctx, "pick detour handler for port ", port, " for ", availableMin, " minutes.")
-				user := inboundHandler.GetUser(request.User.Email)
+				user := inboundHandler.GetOrGenerateUser(request.User.Email)
 				if user == nil {
 					return nil
 				}

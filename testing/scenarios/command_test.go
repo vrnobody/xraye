@@ -118,13 +118,21 @@ func TestProxymanGetAddRemoveInboundUsers(t *testing.T) {
 	hsClient := command.NewHandlerServiceClient(cmdConn)
 
 	// get user
-	getResp, err := hsClient.QueryInbound(ctx, &command.QueryInboundRequest{
-		Tag:       vmessTag,
-		Operation: serial.ToTypedMessage(&command.GetUsersOperation{}),
+	getResp, err := hsClient.GetInboundUsers(ctx, &command.GetInboundUserRequest{
+		Tag:   vmessTag,
+		Email: "",
 	})
 	common.Must(err)
-	if getResp == nil || len(getResp.Content) != 1 {
-		t.Error("unexpected nil response")
+	if getResp == nil || len(getResp.Users) != 1 {
+		t.Error("unexpected 1st nil response")
+	}
+	if getResp.Users[0].Email != userEmail {
+		t.Error("unexpected user1 email")
+	}
+	if inst, err := getResp.Users[0].Account.GetInstance(); err != nil {
+		t.Error("unexpected user1 account")
+	} else if acc, ok := inst.(*vmess.Account); !ok || acc.Id != userID {
+		t.Error("unexpected user1 id")
 	}
 
 	// add user
@@ -147,19 +155,21 @@ func TestProxymanGetAddRemoveInboundUsers(t *testing.T) {
 	}
 
 	// get user
-	getResp, err = hsClient.QueryInbound(ctx, &command.QueryInboundRequest{
-		Tag:       vmessTag,
-		Operation: serial.ToTypedMessage(&command.GetUsersOperation{}),
+	getResp, err = hsClient.GetInboundUsers(ctx, &command.GetInboundUserRequest{
+		Tag:   vmessTag,
+		Email: "",
 	})
 	common.Must(err)
-	if getResp == nil || len(getResp.Content) != 2 {
-		t.Error("unexpected nil response")
+	if getResp == nil || len(getResp.Users) != 2 {
+		t.Error("unexpected 2nd nil response")
 	}
-	if !checkSubstrings(getResp.Content[0], userID, userEmail) {
-		t.Error("unexpected user information")
+	if getResp.Users[1].Email != user2Email {
+		t.Error("unexpected user2 email")
 	}
-	if !checkSubstrings(getResp.Content[1], user2ID, user2Email) {
-		t.Error("unexpected user2 information")
+	if inst, err := getResp.Users[1].Account.GetInstance(); err != nil {
+		t.Error("unexpected user2 account")
+	} else if acc, ok := inst.(*vmess.Account); !ok || acc.Id != user2ID {
+		t.Error("unexpected user2 ID")
 	}
 
 	// remove user
@@ -175,26 +185,14 @@ func TestProxymanGetAddRemoveInboundUsers(t *testing.T) {
 	}
 
 	// get user
-	getResp, err = hsClient.QueryInbound(ctx, &command.QueryInboundRequest{
-		Tag:       vmessTag,
-		Operation: serial.ToTypedMessage(&command.GetUsersOperation{}),
+	getResp, err = hsClient.GetInboundUsers(ctx, &command.GetInboundUserRequest{
+		Tag:   vmessTag,
+		Email: "",
 	})
 	common.Must(err)
-	if getResp == nil || len(getResp.Content) != 1 {
-		t.Error("unexpected nil response")
+	if getResp == nil || len(getResp.Users) != 1 {
+		t.Error("unexpected 3rd nil response")
 	}
-	if !checkSubstrings(getResp.Content[0], user2ID, user2Email) {
-		t.Error("unexpected user2 information")
-	}
-}
-
-func checkSubstrings(str string, subs ...string) bool {
-	for _, sub := range subs {
-		if !strings.Contains(str, sub) {
-			return false
-		}
-	}
-	return true
 }
 
 func TestRouterGetSetRouting(t *testing.T) {
@@ -932,8 +930,8 @@ func TestCommanderAddRemoveUser(t *testing.T) {
 					Listen:   net.NewIPOrDomain(net.LocalHostIP),
 				}),
 				ProxySettings: serial.ToTypedMessage(&dokodemo.Config{
-					Address: net.NewIPOrDomain(dest.Address),
-					Port:    uint32(dest.Port),
+					Address:  net.NewIPOrDomain(dest.Address),
+					Port:     uint32(dest.Port),
 					Networks: []net.Network{net.Network_TCP},
 				}),
 			},
@@ -1087,8 +1085,8 @@ func TestCommanderStats(t *testing.T) {
 					Listen:   net.NewIPOrDomain(net.LocalHostIP),
 				}),
 				ProxySettings: serial.ToTypedMessage(&dokodemo.Config{
-					Address: net.NewIPOrDomain(dest.Address),
-					Port:    uint32(dest.Port),
+					Address:  net.NewIPOrDomain(dest.Address),
+					Port:     uint32(dest.Port),
 					Networks: []net.Network{net.Network_TCP},
 				}),
 			},
@@ -1109,8 +1107,8 @@ func TestCommanderStats(t *testing.T) {
 					Listen:   net.NewIPOrDomain(net.LocalHostIP),
 				}),
 				ProxySettings: serial.ToTypedMessage(&dokodemo.Config{
-					Address: net.NewIPOrDomain(dest.Address),
-					Port:    uint32(dest.Port),
+					Address:  net.NewIPOrDomain(dest.Address),
+					Port:     uint32(dest.Port),
 					Networks: []net.Network{net.Network_TCP},
 				}),
 			},

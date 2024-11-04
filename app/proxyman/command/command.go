@@ -8,6 +8,7 @@ import (
 
 	"github.com/xtls/xray-core/common"
 	"github.com/xtls/xray-core/common/errors"
+	"github.com/xtls/xray-core/common/protocol"
 	"github.com/xtls/xray-core/core"
 
 	"github.com/xtls/xray-core/features/inbound"
@@ -27,12 +28,6 @@ type InboundOperation interface {
 type OutboundOperation interface {
 	// ApplyOutbound applies this operation to the given outbound handler.
 	ApplyOutbound(context.Context, outbound.Handler) error
-}
-
-// InboundQueryOperation is the interface for query operations that applies to inbound handlers.
-type InboundQueryOperation interface {
-	// ApplyInbound applies this operation to the given inbound handler.
-	QueryInbound(context.Context, inbound.Handler) ([]string, error)
 }
 
 func getInbound(handler inbound.Handler) (proxy.Inbound, error) {
@@ -71,21 +66,6 @@ func (op *RemoveUserOperation) ApplyInbound(ctx context.Context, handler inbound
 		return errors.New("proxy is not a UserManager")
 	}
 	return um.RemoveUser(ctx, op.Email)
-}
-
-func (op *GetUsersOperation) QueryInbound(ctx context.Context, handler inbound.Handler) ([]string, error) {
-	p, err := getInbound(handler)
-	if err != nil {
-		return nil, err
-	}
-	um, ok := p.(proxy.UserManager)
-	if !ok {
-		return nil, errors.New("proxy is not a UserManager")
-	}
-	if content, ok := um.GetUsers(ctx); ok {
-		return content, nil
-	}
-	return nil, errors.New("failed to get users")
 }
 
 type handlerServer struct {
@@ -151,27 +131,44 @@ func (s *handlerServer) AlterInbound(ctx context.Context, request *AlterInboundR
 	return &AlterInboundResponse{}, operation.ApplyInbound(ctx, handler)
 }
 
-func (s *handlerServer) QueryInbound(ctx context.Context, request *QueryInboundRequest) (*QueryInboundResponse, error) {
-	rawOperation, err := request.Operation.GetInstance()
-	if err != nil {
-		return nil, errors.New("unknown operation").Base(err)
-	}
-	operation, ok := rawOperation.(InboundQueryOperation)
-	if !ok {
-		return nil, errors.New("not an inbound operation")
-	}
-
+func (s *handlerServer) GetInboundUsers(ctx context.Context, request *GetInboundUserRequest) (*GetInboundUserResponse, error) {
 	handler, err := s.ihm.GetHandler(ctx, request.Tag)
 	if err != nil {
 		return nil, errors.New("failed to get handler: ", request.Tag).Base(err)
 	}
-
-	resp, err := operation.QueryInbound(ctx, handler)
+	p, err := getInbound(handler)
 	if err != nil {
 		return nil, err
 	}
+	um, ok := p.(proxy.UserManager)
+	if !ok {
+		return nil, errors.New("proxy is not a UserManager")
+	}
+	if len(request.Email) > 0 {
+		return &GetInboundUserResponse{Users: []*protocol.User{protocol.ToProtoUser(um.GetUser(ctx, request.Email))}}, nil
+	}
+	var result = make([]*protocol.User, 0, 100)
+	users := um.GetUsers(ctx)
+	for _, u := range users {
+		result = append(result, protocol.ToProtoUser(u))
+	}
+	return &GetInboundUserResponse{Users: result}, nil
+}
 
-	return &QueryInboundResponse{Content: resp}, nil
+func (s *handlerServer) GetInboundUsersCount(ctx context.Context, request *GetInboundUserRequest) (*GetInboundUsersCountResponse, error) {
+	handler, err := s.ihm.GetHandler(ctx, request.Tag)
+	if err != nil {
+		return nil, errors.New("failed to get handler: ", request.Tag).Base(err)
+	}
+	p, err := getInbound(handler)
+	if err != nil {
+		return nil, err
+	}
+	um, ok := p.(proxy.UserManager)
+	if !ok {
+		return nil, errors.New("proxy is not a UserManager")
+	}
+	return &GetInboundUsersCountResponse{Count: um.GetUsersCount(ctx)}, nil
 }
 
 func (s *handlerServer) GetAllOutbounds(ctx context.Context, request *GetAllOutboundsRequest) (*GetAllOutboundsResponse, error) {

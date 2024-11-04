@@ -73,14 +73,20 @@ type Outbound interface {
 
 // UserManager is the interface for Inbounds and Outbounds that can manage their users.
 type UserManager interface {
-	// GetUsers return json serialized all users info
-	GetUsers(context.Context) ([]string, bool)
-
 	// AddUser adds a new user.
 	AddUser(context.Context, *protocol.MemoryUser) error
 
 	// RemoveUser removes a user by email.
 	RemoveUser(context.Context, string) error
+	
+	// Get user by email.
+	GetUser(context.Context, string) *protocol.MemoryUser
+
+	// Get all users.
+	GetUsers(context.Context) []*protocol.MemoryUser
+
+	// Get users count.
+	GetUsersCount(context.Context) int64
 }
 
 type GetInbound interface {
