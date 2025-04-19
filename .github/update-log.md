@@ -9,9 +9,10 @@
 ### 详细更新记录
 
 #### exp #23
-更新xray-core至v25.03.31  
+更新 xray-core 至 v25.03.31（commit ab5d7cf3）  
 屏蔽 websocket 传输协议的“过时”警告  
 移除 [#3460](https://github.com/XTLS/Xray-core/issues/3460) 补丁  
+移除 win7 发布，请到 [Xray-core](https://github.com/XTLS/Xray-core) 下载原版  
 
 #### exp #22
 更新xray-core至v24.10.31 (commit 2c72864)  

@@ -138,16 +138,6 @@ jobs:
             goarch: arm
             goarm: 7
           # END OPENBSD ARM
-          # BEGIN Windows 7
-          - goos: windows
-            goarch: amd64
-            gotoolchain: 1.21.4
-            patch-assetname: win7-64
-          - goos: windows
-            goarch: 386
-            gotoolchain: 1.21.4
-            patch-assetname: win7-32
-          # END Windows 7
       fail-fast: false
 
     runs-on: ubuntu-latest
