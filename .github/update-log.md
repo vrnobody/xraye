@@ -5,9 +5,13 @@
 移除reverse功能  
 移除yaml/toml配置格式，只支持json配置格式  
 移除routing相关的adrules/rmrules/sib命令（和现有命令冲突）  
-修复windows下iperf3并发测速断流问题（XTLS/Xray-core issue [#3460](https://github.com/XTLS/Xray-core/issues/3460)）  
 
 ### 详细更新记录
+
+#### exp #23
+更新xray-core至v25.03.31  
+屏蔽 websocket 传输协议的“过时”警告  
+移除 [#3460](https://github.com/XTLS/Xray-core/issues/3460) 补丁  
 
 #### exp #22
 更新xray-core至v24.10.31 (commit 2c72864)  

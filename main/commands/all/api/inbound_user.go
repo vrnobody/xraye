@@ -8,20 +8,28 @@ import (
 var cmdInboundUser = &base.Command{
 	CustomFlags: true,
 	UsageLine:   "{{.Exec}} api inbounduser [--server=127.0.0.1:8080] -tag=tag [-email=email]",
-	Short:       "Get Inbound User",
+	Short:       "Retrieve inbound user(s)",
 	Long: `
 Get User info from an inbound.
+
 Arguments:
-	-s, -server 
+
+	-s, -server <server:port>
 		The API server address. Default 127.0.0.1:8080
-	-t, -timeout
-		Timeout seconds to call API. Default 3
+
+	-t, -timeout <seconds>
+		Timeout in seconds for calling API. Default 3
+
 	-tag
 	    Inbound tag
-    -email
-		User email. If email is not given, will get all users
+
+	-email
+		The user's email address. If not provided, all users will be retrieved.
+
 Example:
-    {{.Exec}} {{.LongName}} --server=127.0.0.1:8080 -tag="tag name" -email="xray@love.com"
+
+	{{.Exec}} {{.LongName}} --server=127.0.0.1:8080 -tag="tag name"
+	{{.Exec}} {{.LongName}} --server=127.0.0.1:8080 -tag="tag name" -email="xray@love.com"
 `,
 	Run: executeInboundUser,
 }
@@ -39,7 +47,7 @@ func executeInboundUser(cmd *base.Command, args []string) {
 
 	client := handlerService.NewHandlerServiceClient(conn)
 	r := &handlerService.GetInboundUserRequest{
-		Tag: tag,
+		Tag:   tag,
 		Email: email,
 	}
 	resp, err := client.GetInboundUsers(ctx, r)

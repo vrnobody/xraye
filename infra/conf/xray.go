@@ -23,6 +23,7 @@ var (
 	inboundConfigLoader = NewJSONConfigLoader(ConfigCreatorCache{
 		"dokodemo-door": func() interface{} { return new(DokodemoConfig) },
 		"http":          func() interface{} { return new(HTTPServerConfig) },
+		"mixed":         func() interface{} { return new(SocksServerConfig) },
 		"socks":         func() interface{} { return new(SocksServerConfig) },
 		"vless":         func() interface{} { return new(VLessInboundConfig) },
 		"vmess":         func() interface{} { return new(VMessInboundConfig) },
@@ -236,14 +237,14 @@ func (c *InboundDetourConfig) Build() (*core.InboundHandlerConfig, error) {
 	}
 	rawConfig, err := inboundConfigLoader.LoadWithID(settings, c.Protocol)
 	if err != nil {
-		return nil, errors.New("failed to load inbound detour config.").Base(err)
+		return nil, errors.New("failed to load inbound detour config for protocol ", c.Protocol).Base(err)
 	}
 	if dokodemoConfig, ok := rawConfig.(*DokodemoConfig); ok {
 		receiverSettings.ReceiveOriginalDestination = dokodemoConfig.Redirect
 	}
 	ts, err := rawConfig.(Buildable).Build()
 	if err != nil {
-		return nil, err
+		return nil, errors.New("failed to build inbound handler for protocol ", c.Protocol).Base(err)
 	}
 
 	return &core.InboundHandlerConfig{
@@ -287,7 +288,9 @@ func (c *OutboundDetourConfig) Build() (*core.OutboundHandlerConfig, error) {
 			senderSettings.ViaCidr = strings.Split(*c.SendThrough, "/")[1]
 		} else {
 			if address.Family().IsDomain() {
-				return nil, errors.New("unable to send through: " + address.String())
+				if address.Address.Domain() != "origin" {
+					return nil, errors.New("unable to send through: " + address.String())
+				}
 			}
 		}
 		senderSettings.Via = address.Build()
@@ -296,7 +299,7 @@ func (c *OutboundDetourConfig) Build() (*core.OutboundHandlerConfig, error) {
 	if c.StreamSetting != nil {
 		ss, err := c.StreamSetting.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build stream settings for outbound detour").Base(err)
 		}
 		senderSettings.StreamSettings = ss
 	}
@@ -304,7 +307,7 @@ func (c *OutboundDetourConfig) Build() (*core.OutboundHandlerConfig, error) {
 	if c.ProxySettings != nil {
 		ps, err := c.ProxySettings.Build()
 		if err != nil {
-			return nil, errors.New("invalid outbound detour proxy settings.").Base(err)
+			return nil, errors.New("invalid outbound detour proxy settings").Base(err)
 		}
 		if ps.TransportLayerProxy {
 			if senderSettings.StreamSettings != nil {
@@ -324,7 +327,7 @@ func (c *OutboundDetourConfig) Build() (*core.OutboundHandlerConfig, error) {
 	if c.MuxSettings != nil {
 		ms, err := c.MuxSettings.Build()
 		if err != nil {
-			return nil, errors.New("failed to build Mux config.").Base(err)
+			return nil, errors.New("failed to build Mux config").Base(err)
 		}
 		senderSettings.MultiplexSettings = ms
 	}
@@ -335,11 +338,11 @@ func (c *OutboundDetourConfig) Build() (*core.OutboundHandlerConfig, error) {
 	}
 	rawConfig, err := outboundConfigLoader.LoadWithID(settings, c.Protocol)
 	if err != nil {
-		return nil, errors.New("failed to parse to outbound detour config.").Base(err)
+		return nil, errors.New("failed to load outbound detour config for protocol ", c.Protocol).Base(err)
 	}
 	ts, err := rawConfig.(Buildable).Build()
 	if err != nil {
-		return nil, err
+		return nil, errors.New("failed to build outbound handler for protocol ", c.Protocol).Base(err)
 	}
 
 	return &core.OutboundHandlerConfig{
@@ -359,7 +362,7 @@ func (c *StatsConfig) Build() (*stats.Config, error) {
 type Config struct {
 	// Deprecated: Global transport config is no longer used
 	// left for returning error
-	Transport        map[string]json.RawMessage `json:"transport"`
+	Transport map[string]json.RawMessage `json:"transport"`
 
 	LogConfig        *LogConfig              `json:"log"`
 	RouterConfig     *RouterConfig           `json:"routing"`
@@ -479,7 +482,7 @@ func (c *Config) Override(o *Config, fn string) {
 // Build implements Buildable.
 func (c *Config) Build() (*core.Config, error) {
 	if err := PostProcessConfigureFile(c); err != nil {
-		return nil, err
+		return nil, errors.New("failed to post-process configuration file").Base(err)
 	}
 
 	config := &core.Config{
@@ -493,21 +496,21 @@ func (c *Config) Build() (*core.Config, error) {
 	if c.API != nil {
 		apiConf, err := c.API.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build API configuration").Base(err)
 		}
 		config.App = append(config.App, serial.ToTypedMessage(apiConf))
 	}
 	if c.Metrics != nil {
 		metricsConf, err := c.Metrics.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build metrics configuration").Base(err)
 		}
 		config.App = append(config.App, serial.ToTypedMessage(metricsConf))
 	}
 	if c.Stats != nil {
 		statsConf, err := c.Stats.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build stats configuration").Base(err)
 		}
 		config.App = append(config.App, serial.ToTypedMessage(statsConf))
 	}
@@ -525,7 +528,7 @@ func (c *Config) Build() (*core.Config, error) {
 	if c.RouterConfig != nil {
 		routerConfig, err := c.RouterConfig.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build routing configuration").Base(err)
 		}
 		config.App = append(config.App, serial.ToTypedMessage(routerConfig))
 	}
@@ -533,7 +536,7 @@ func (c *Config) Build() (*core.Config, error) {
 	if c.DNSConfig != nil {
 		dnsApp, err := c.DNSConfig.Build()
 		if err != nil {
-			return nil, errors.New("failed to parse DNS config").Base(err)
+			return nil, errors.New("failed to build DNS configuration").Base(err)
 		}
 		config.App = append(config.App, serial.ToTypedMessage(dnsApp))
 	}
@@ -541,7 +544,7 @@ func (c *Config) Build() (*core.Config, error) {
 	if c.Policy != nil {
 		pc, err := c.Policy.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build policy configuration").Base(err)
 		}
 		config.App = append(config.App, serial.ToTypedMessage(pc))
 	}
@@ -549,7 +552,7 @@ func (c *Config) Build() (*core.Config, error) {
 	if c.FakeDNS != nil {
 		r, err := c.FakeDNS.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build fake DNS configuration").Base(err)
 		}
 		config.App = append([]*serial.TypedMessage{serial.ToTypedMessage(r)}, config.App...)
 	}
@@ -557,7 +560,7 @@ func (c *Config) Build() (*core.Config, error) {
 	if c.Observatory != nil {
 		r, err := c.Observatory.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build observatory configuration").Base(err)
 		}
 		config.App = append(config.App, serial.ToTypedMessage(r))
 	}
@@ -565,7 +568,7 @@ func (c *Config) Build() (*core.Config, error) {
 	if c.BurstObservatory != nil {
 		r, err := c.BurstObservatory.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build burst observatory configuration").Base(err)
 		}
 		config.App = append(config.App, serial.ToTypedMessage(r))
 	}
@@ -583,7 +586,7 @@ func (c *Config) Build() (*core.Config, error) {
 	for _, rawInboundConfig := range inbounds {
 		ic, err := rawInboundConfig.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build inbound config with tag ", rawInboundConfig.Tag).Base(err)
 		}
 		config.Inbound = append(config.Inbound, ic)
 	}
@@ -597,7 +600,7 @@ func (c *Config) Build() (*core.Config, error) {
 	for _, rawOutboundConfig := range outbounds {
 		oc, err := rawOutboundConfig.Build()
 		if err != nil {
-			return nil, err
+			return nil, errors.New("failed to build outbound config with tag ", rawOutboundConfig.Tag).Base(err)
 		}
 		config.Outbound = append(config.Outbound, oc)
 	}
