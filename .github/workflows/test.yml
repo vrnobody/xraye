@@ -69,9 +69,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
-          check-latest: true
-          cache: false
+          go-version-file: 'go.mod'
       - name: Restore Cache
         uses: actions/cache/restore@v4
         with:

@@ -61,7 +61,6 @@ jobs:
         # Include amd64 on all platforms.
         goos: [windows, freebsd, openbsd, linux, darwin]
         goarch: [amd64, 386]
-        gotoolchain: [""]
         patch-assetname: [""]
 
         exclude:
@@ -162,9 +161,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.gotoolchain || '1.24' }}
-          check-latest: true
-          cache: false
+          go-version-file: 'go.mod'
 
       - name: Get project dependencies
         run: go mod download
