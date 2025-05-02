@@ -8,6 +8,9 @@
 
 ### 详细更新记录
 
+#### exp #24
+更新 xray-core 至 v25.04.30（commit 87ab8e5）  
+
 #### exp #23
 更新 xray-core 至 v25.03.31（commit ab5d7cf3）  
 屏蔽 websocket 传输协议的“过时”警告  

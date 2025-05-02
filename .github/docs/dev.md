@@ -1,7 +1,10 @@
 #### golang
 修改go.mod后执行`go mod tidy`更新go.sum  
 版本信息修改：core\core.go  
-更新全部protobuf: `go run ./infra/vprotogen/main.go -pwd .`  
+
+更新全部protobuf: 
+go run ./infra/vprotogen/main.go -pwd .
+
 过滤merge confict: `cat conflict.txt | grep -v -P "\.pb\.go$"`  
 
 #### protobuf

@@ -35,13 +35,14 @@ jobs:
               echo -e "Verifying HASH key..."
               HASH="$(curl -sL "https://raw.githubusercontent.com/v2fly/${INFO[0]}/release/${INFO[1]}.dat.sha256sum" | awk -F ' ' '{print $1}')"
               if [ -s "./resources/${FILE_NAME}" ] && [ "$(sha256sum "./resources/${FILE_NAME}" | awk -F ' ' '{print $1}')" == "${HASH}" ]; then
-                  continue
+                echo "using cached: ./resources/${FILE_NAME}"
+                continue
               else
-                  echo -e "Downloading https://raw.githubusercontent.com/v2fly/${INFO[0]}/release/${INFO[1]}.dat..."
-                  curl -L "https://raw.githubusercontent.com/v2fly/${INFO[0]}/release/${INFO[1]}.dat" -o ./resources/${FILE_NAME}
-                  echo -e "Verifying HASH key..."
-                  [ "$(sha256sum "./resources/${FILE_NAME}" | awk -F ' ' '{print $1}')" == "${HASH}" ] || { echo -e "The HASH key of ${FILE_NAME} does not match cloud one."; exit 1; }
-                  echo "unhit=true" >> $GITHUB_OUTPUT
+                echo -e "Downloading https://raw.githubusercontent.com/v2fly/${INFO[0]}/release/${INFO[1]}.dat..."
+                curl -L "https://raw.githubusercontent.com/v2fly/${INFO[0]}/release/${INFO[1]}.dat" -o ./resources/${FILE_NAME}
+                echo -e "Verifying HASH key..."
+                [ "$(sha256sum "./resources/${FILE_NAME}" | awk -F ' ' '{print $1}')" == "${HASH}" ] || { echo -e "The HASH key of ${FILE_NAME} does not match cloud one."; exit 1; }
+                echo "unhit=true" >> $GITHUB_OUTPUT
               fi
             done
 
@@ -61,6 +62,7 @@ jobs:
         # Include amd64 on all platforms.
         goos: [windows, freebsd, openbsd, linux, darwin]
         goarch: [amd64, 386]
+        gotoolchain: [""]
         patch-assetname: [""]
 
         exclude:
@@ -161,7 +163,9 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
+          go-version: ${{ matrix.gotoolchain || '1.24' }}
+          check-latest: true
+          cache: false
 
       - name: Get project dependencies
         run: go mod download
