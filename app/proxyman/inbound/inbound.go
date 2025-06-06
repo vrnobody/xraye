@@ -2,7 +2,6 @@ package inbound
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/xtls/xray-core/app/proxyman"
@@ -28,29 +27,12 @@ func New(ctx context.Context, config *proxyman.InboundConfig) (*Manager, error) 
 	m := &Manager{
 		taggedHandlers: make(map[string]inbound.Handler),
 	}
-	var _ inbound.Manager = m
 	return m, nil
 }
 
 // Type implements common.HasType.
 func (*Manager) Type() interface{} {
 	return inbound.ManagerType()
-}
-
-// GetAllHandlers returns all handlers.
-func (m *Manager) GetAllHandlers(ctx context.Context) ([]inbound.Handler, error) {
-	m.access.RLock()
-	defer m.access.RUnlock()
-
-	if size := len(m.untaggedHandler) + len(m.taggedHandlers); size > 0 {
-		hs := make([]inbound.Handler, 0)
-		hs = append(hs, m.untaggedHandler...)
-		for _, h := range m.taggedHandlers {
-			hs = append(hs, h)
-		}
-		return hs, nil
-	}
-	return nil, errors.New("no handler found")
 }
 
 // AddHandler implements inbound.Manager.
@@ -80,56 +62,46 @@ func (m *Manager) GetHandler(ctx context.Context, tag string) (inbound.Handler, 
 	m.access.RLock()
 	defer m.access.RUnlock()
 
-	switch t := proxyman.ParseTag(tag).(type) {
-	case int:
-		if t >= 0 && t < len(m.untaggedHandler) {
-			return m.untaggedHandler[t], nil
-		}
-	case string:
-		if h, found := m.taggedHandlers[t]; found {
-			return h, nil
-		}
+	handler, found := m.taggedHandlers[tag]
+	if !found {
+		return nil, errors.New("handler not found: ", tag)
 	}
-	return nil, errors.New("handler not found: ", tag)
+	return handler, nil
 }
 
 // RemoveHandler implements inbound.Manager.
 func (m *Manager) RemoveHandler(ctx context.Context, tag string) error {
+	if tag == "" {
+		return common.ErrNoClue
+	}
+
 	m.access.Lock()
 	defer m.access.Unlock()
 
-	var handler inbound.Handler
-	switch t := proxyman.ParseTag(tag).(type) {
-	case int:
-		if t >= 0 && t < len(m.untaggedHandler) {
-			handler = m.untaggedHandler[t]
-			uh := m.untaggedHandler
-			m.untaggedHandler = append(uh[:t], uh[t+1:]...)
-		} else {
-			emsg := fmt.Sprintf("handler #%d index out of range", t)
-			errors.LogWarning(ctx, emsg)
-			return errors.New(emsg)
-		}
-	case string:
-		if h, found := m.taggedHandlers[t]; found {
-			handler = h
-			delete(m.taggedHandlers, t)
-		} else {
-			emsg := fmt.Sprintf("handler %s not found", t)
-			errors.LogWarning(ctx, emsg)
-			return errors.New(emsg)
-		}
-	case error:
-		return t
-	}
-
-	if handler != nil {
+	if handler, found := m.taggedHandlers[tag]; found {
 		if err := handler.Close(); err != nil {
 			errors.LogWarningInner(ctx, err, "failed to close handler ", tag)
 		}
+		delete(m.taggedHandlers, tag)
 		return nil
 	}
+
 	return common.ErrNoClue
+}
+
+// ListHandlers implements inbound.Manager.
+func (m *Manager) ListHandlers(ctx context.Context) []inbound.Handler {
+	m.access.RLock()
+	defer m.access.RUnlock()
+
+	var response []inbound.Handler
+	copy(m.untaggedHandler, response)
+
+	for _, v := range m.taggedHandlers {
+		response = append(response, v)
+	}
+
+	return response
 }
 
 // Start implements common.Runnable.

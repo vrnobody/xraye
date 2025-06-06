@@ -18,12 +18,6 @@ message RemoveUserOperation {
   string email = 1;
 }
 
-message GetAllInboundsRequest {}
-
-message GetAllInboundsResponse {
-  repeated xray.core.InboundHandlerConfig configs = 1;
-}
-
 message AddInboundRequest {
   core.InboundHandlerConfig inbound = 1;
 }
@@ -43,6 +37,12 @@ message AlterInboundRequest {
 
 message AlterInboundResponse {}
 
+message ListInboundsRequest {}
+
+message ListInboundsResponse {
+  repeated core.InboundHandlerConfig inbounds = 1;
+}
+
 message GetInboundUserRequest {
   string tag = 1;
   string email = 2;
@@ -54,12 +54,6 @@ message GetInboundUserResponse {
 
 message GetInboundUsersCountResponse {
   int64 count = 1;
-}
-
-message GetAllOutboundsRequest {}
-
-message GetAllOutboundsResponse {
-  repeated xray.core.OutboundHandlerConfig configs = 1;
 }
 
 message AddOutboundRequest {
@@ -81,26 +75,32 @@ message AlterOutboundRequest {
 
 message AlterOutboundResponse {}
 
-service HandlerService {
-  rpc GetAllInbounds(GetAllInboundsRequest) returns (GetAllInboundsResponse) {}
+message ListOutboundsRequest {}
 
+message ListOutboundsResponse {
+  repeated core.OutboundHandlerConfig outbounds = 1;
+}
+
+service HandlerService {
   rpc AddInbound(AddInboundRequest) returns (AddInboundResponse) {}
 
   rpc RemoveInbound(RemoveInboundRequest) returns (RemoveInboundResponse) {}
 
   rpc AlterInbound(AlterInboundRequest) returns (AlterInboundResponse) {}
 
+  rpc ListInbounds(ListInboundsRequest) returns (ListInboundsResponse) {}
+
   rpc GetInboundUsers(GetInboundUserRequest) returns (GetInboundUserResponse) {}
 
   rpc GetInboundUsersCount(GetInboundUserRequest) returns (GetInboundUsersCountResponse) {}
-
-  rpc GetAllOutbounds(GetAllOutboundsRequest) returns (GetAllOutboundsResponse) {}
 
   rpc AddOutbound(AddOutboundRequest) returns (AddOutboundResponse) {}
 
   rpc RemoveOutbound(RemoveOutboundRequest) returns (RemoveOutboundResponse) {}
 
   rpc AlterOutbound(AlterOutboundRequest) returns (AlterOutboundResponse) {}
+
+  rpc ListOutbounds(ListOutboundsRequest) returns (ListOutboundsResponse) {}
 }
 
 message Config {}

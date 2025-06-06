@@ -5,7 +5,8 @@
 更新全部protobuf: 
 go run ./infra/vprotogen/main.go -pwd .
 
-过滤merge confict: `cat conflict.txt | grep -v -P "\.pb\.go$"`  
+查看差异文件名：
+`git diff origin/main --name-only | grep -v -P "\.pb\.go$" | less`  
 
 #### protobuf
 ```bash

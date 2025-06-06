@@ -33,6 +33,7 @@ import (
 	"github.com/xtls/xray-core/testing/servers/tcp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 func TestProxymanGetAddRemoveInboundUsers(t *testing.T) {
@@ -320,346 +321,6 @@ func getRoutingRulesTest(t *testing.T, client routercmd.RoutingServiceClient, ru
 	}
 }
 
-func TestProxymanGetAddRemoveOutboundHandler(t *testing.T) {
-	tcpServer := tcp.Server{
-		MsgProcessor: xor,
-	}
-	dest, err := tcpServer.Start()
-	common.Must(err)
-	defer tcpServer.Close()
-
-	cmdPort := tcp.PickPort()
-	config := &core.Config{
-		App: []*serial.TypedMessage{
-			serial.ToTypedMessage(&commander.Config{
-				Tag: "api",
-				Service: []*serial.TypedMessage{
-					serial.ToTypedMessage(&command.Config{}),
-				},
-			}),
-			serial.ToTypedMessage(&router.Config{
-				Rule: []*router.RoutingRule{
-					{
-						InboundTag: []string{"api"},
-						TargetTag: &router.RoutingRule_Tag{
-							Tag: "api",
-						},
-					},
-				},
-			}),
-		},
-		Inbound: []*core.InboundHandlerConfig{
-			{
-				Tag: "api",
-				ReceiverSettings: serial.ToTypedMessage(&proxyman.ReceiverConfig{
-					PortList: &net.PortList{Range: []*net.PortRange{net.SinglePortRange(cmdPort)}},
-					Listen:   net.NewIPOrDomain(net.LocalHostIP),
-				}),
-				ProxySettings: serial.ToTypedMessage(&dokodemo.Config{
-					Address:  net.NewIPOrDomain(dest.Address),
-					Port:     uint32(dest.Port),
-					Networks: []net.Network{net.Network_TCP},
-				}),
-			},
-		},
-		Outbound: []*core.OutboundHandlerConfig{
-			{
-				Tag:           "default-outbound",
-				ProxySettings: serial.ToTypedMessage(&freedom.Config{}),
-			},
-		},
-	}
-
-	servers, err := InitializeServerConfigs(config)
-	common.Must(err)
-	defer CloseAllServers(servers)
-
-	cmdConn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", cmdPort), grpc.WithInsecure(), grpc.WithBlock())
-	common.Must(err)
-	defer cmdConn.Close()
-
-	hsClient := command.NewHandlerServiceClient(cmdConn)
-
-	ctx := context.Background()
-
-	{
-		// GetIn(Out)bound test
-		getResp, err := hsClient.GetAllOutbounds(ctx, &command.GetAllOutboundsRequest{})
-		common.Must(err)
-		if getResp == nil || len(getResp.Configs) != 1 {
-			t.Error("unexpected inbound length")
-		}
-	}
-
-	{
-		addResp, err := hsClient.AddOutbound(ctx, &command.AddOutboundRequest{
-			Outbound: createOutbound(""),
-		})
-		common.Must(err)
-		if addResp == nil {
-			t.Error("unexpected nil response")
-		}
-
-		addResp, err = hsClient.AddOutbound(ctx, &command.AddOutboundRequest{
-			Outbound: createOutbound("0"),
-		})
-		common.Must(err)
-		if addResp == nil {
-			t.Error("unexpected nil response")
-		}
-
-		addResp, err = hsClient.AddOutbound(ctx, &command.AddOutboundRequest{
-			Outbound: createOutbound("1"),
-		})
-		common.Must(err)
-		if addResp == nil {
-			t.Error("unexpected nil response")
-		}
-
-		getResp, err := hsClient.GetAllOutbounds(ctx, &command.GetAllOutboundsRequest{})
-		common.Must(err)
-		if getResp == nil || len(getResp.Configs) != 4 {
-			t.Errorf("outbounds length is not 4")
-		}
-
-		_, err = hsClient.RemoveOutbound(ctx, &command.RemoveOutboundRequest{
-			Tag: "#1",
-		})
-		if err == nil {
-			t.Error("unexpected nil error #1")
-		}
-
-		rmResp, err := hsClient.RemoveOutbound(ctx, &command.RemoveOutboundRequest{
-			Tag: "0",
-		})
-		common.Must(err)
-		if rmResp == nil {
-			t.Error("unexpected nil response 0")
-		}
-
-		getResp, err = hsClient.GetAllOutbounds(ctx, &command.GetAllOutboundsRequest{})
-		common.Must(err)
-		if getResp == nil || len(getResp.Configs) != 3 {
-			t.Error("outbounds length is not 3")
-		}
-
-		_, err = hsClient.RemoveOutbound(ctx, &command.RemoveOutboundRequest{
-			Tag: "0000",
-		})
-		// why RemoveOutbound by tag always return nil?
-		if err != nil {
-			t.Error("unexpected error 0000")
-		}
-
-		addResp, err = hsClient.AddOutbound(ctx, &command.AddOutboundRequest{
-			Outbound: createOutbound("0"),
-		})
-		common.Must(err)
-		if addResp == nil {
-			t.Error("unexpected nil response")
-		}
-
-		rmResp, err = hsClient.RemoveOutbound(ctx, &command.RemoveOutboundRequest{
-			Tag: "#0",
-		})
-		common.Must(err)
-		if rmResp == nil {
-			t.Error("unexpected nil response #0")
-		}
-
-		getResp, err = hsClient.GetAllOutbounds(ctx, &command.GetAllOutboundsRequest{})
-		common.Must(err)
-		if getResp == nil || len(getResp.Configs) != 3 {
-			t.Error("outbounds length is not 3")
-		}
-
-		rmResp, err = hsClient.RemoveOutbound(ctx, &command.RemoveOutboundRequest{
-			Tag: "*",
-		})
-		common.Must(err)
-		if rmResp == nil {
-			t.Error("unexpected nil response *")
-		}
-
-		rmResp, err = hsClient.RemoveOutbound(ctx, &command.RemoveOutboundRequest{
-			Tag: "*",
-		})
-		common.Must(err)
-		if rmResp == nil {
-			t.Error("unexpected nil response *")
-		}
-
-		getResp, err = hsClient.GetAllOutbounds(ctx, &command.GetAllOutboundsRequest{})
-		common.Must(err)
-		if getResp == nil || len(getResp.Configs) != 0 {
-			t.Error("outbounds length is not 0")
-		}
-
-	}
-}
-
-func createOutbound(tag string) *core.OutboundHandlerConfig {
-	return &core.OutboundHandlerConfig{
-		Tag:           tag,
-		ProxySettings: serial.ToTypedMessage(&freedom.Config{}),
-	}
-}
-
-func TestProxymanGetAddRemoveInboundHandler(t *testing.T) {
-	tcpServer := tcp.Server{
-		MsgProcessor: xor,
-	}
-	dest, err := tcpServer.Start()
-	common.Must(err)
-	defer tcpServer.Close()
-
-	cmdPort := tcp.PickPort()
-	config := &core.Config{
-		App: []*serial.TypedMessage{
-			serial.ToTypedMessage(&commander.Config{
-				Tag: "api",
-				Service: []*serial.TypedMessage{
-					serial.ToTypedMessage(&command.Config{}),
-				},
-			}),
-			serial.ToTypedMessage(&router.Config{
-				Rule: []*router.RoutingRule{
-					{
-						InboundTag: []string{"api"},
-						TargetTag: &router.RoutingRule_Tag{
-							Tag: "api",
-						},
-					},
-				},
-			}),
-		},
-		Inbound: []*core.InboundHandlerConfig{
-			{
-				Tag: "api",
-				ReceiverSettings: serial.ToTypedMessage(&proxyman.ReceiverConfig{
-					PortList: &net.PortList{Range: []*net.PortRange{net.SinglePortRange(cmdPort)}},
-					Listen:   net.NewIPOrDomain(net.LocalHostIP),
-				}),
-				ProxySettings: serial.ToTypedMessage(&dokodemo.Config{
-					Address:  net.NewIPOrDomain(dest.Address),
-					Port:     uint32(dest.Port),
-					Networks: []net.Network{net.Network_TCP},
-				}),
-			},
-		},
-		Outbound: []*core.OutboundHandlerConfig{
-			{
-				Tag:           "default-outbound",
-				ProxySettings: serial.ToTypedMessage(&freedom.Config{}),
-			},
-		},
-	}
-
-	servers, err := InitializeServerConfigs(config)
-	common.Must(err)
-	defer CloseAllServers(servers)
-
-	cmdConn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", cmdPort), grpc.WithInsecure(), grpc.WithBlock())
-	common.Must(err)
-	defer cmdConn.Close()
-
-	hsClient := command.NewHandlerServiceClient(cmdConn)
-
-	ctx := context.Background()
-
-	{
-		// GetIn(Out)bound test
-		getResp, err := hsClient.GetAllInbounds(ctx, &command.GetAllInboundsRequest{})
-		common.Must(err)
-		if getResp == nil || len(getResp.Configs) != 1 {
-			t.Error("unexpected inbounds length")
-		}
-	}
-
-	{
-		addResp, err := hsClient.AddInbound(ctx, &command.AddInboundRequest{
-			Inbound: createInbound(dest, ""),
-		})
-		common.Must(err)
-		if addResp == nil {
-			t.Error("unexpected nil response ()")
-		}
-
-		addResp, err = hsClient.AddInbound(ctx, &command.AddInboundRequest{
-			Inbound: createInbound(dest, "0"),
-		})
-		common.Must(err)
-		if addResp == nil {
-			t.Error("unexpected nil response 0")
-		}
-
-		getResp, err := hsClient.GetAllInbounds(ctx, &command.GetAllInboundsRequest{})
-		common.Must(err)
-		if getResp == nil || len(getResp.Configs) != 3 {
-			t.Error("unexpected inbounds length 3")
-		}
-
-		_, err = hsClient.RemoveInbound(ctx, &command.RemoveInboundRequest{
-			Tag: "#1",
-		})
-		if err == nil {
-			t.Error("unexpected nil error #1")
-		}
-
-		rmResp, err := hsClient.RemoveInbound(ctx, &command.RemoveInboundRequest{
-			Tag: "#0",
-		})
-		common.Must(err)
-		if rmResp == nil {
-			t.Error("unexpected nil response #0")
-		}
-
-		getResp, err = hsClient.GetAllInbounds(ctx, &command.GetAllInboundsRequest{})
-		common.Must(err)
-		if getResp == nil || len(getResp.Configs) != 2 {
-			t.Error("unexpected inbounds length 2")
-		}
-
-		_, err = hsClient.RemoveInbound(ctx, &command.RemoveInboundRequest{
-			Tag: "0000",
-		})
-		if err == nil {
-			t.Error("unexpected nil error 0000")
-		}
-
-		rmResp, err = hsClient.RemoveInbound(ctx, &command.RemoveInboundRequest{
-			Tag: "0",
-		})
-		common.Must(err)
-		if rmResp == nil {
-			t.Error("unexpected nil response 0")
-		}
-
-		getResp, err = hsClient.GetAllInbounds(ctx, &command.GetAllInboundsRequest{})
-		common.Must(err)
-		if getResp == nil || len(getResp.Configs) != 1 {
-			t.Error("unexpected inbounds length 1")
-		}
-
-	}
-}
-
-func createInbound(dest net.Destination, tag string) *core.InboundHandlerConfig {
-	port := tcp.PickPort()
-	return &core.InboundHandlerConfig{
-		Tag: tag,
-		ReceiverSettings: serial.ToTypedMessage(&proxyman.ReceiverConfig{
-			PortList: &net.PortList{Range: []*net.PortRange{net.SinglePortRange(port)}},
-			Listen:   net.NewIPOrDomain(net.LocalHostIP),
-		}),
-		ProxySettings: serial.ToTypedMessage(&dokodemo.Config{
-			Address:  net.NewIPOrDomain(dest.Address),
-			Port:     uint32(dest.Port),
-			Networks: []net.Network{net.Network_TCP},
-		}),
-	}
-}
-
 func TestCommanderListenConfigurationItem(t *testing.T) {
 	tcpServer := tcp.Server{
 		MsgProcessor: xor,
@@ -826,6 +487,104 @@ func TestCommanderRemoveHandler(t *testing.T) {
 		if err == nil {
 			t.Error("unexpected nil error")
 		}
+	}
+}
+
+func TestCommanderListHandlers(t *testing.T) {
+	tcpServer := tcp.Server{
+		MsgProcessor: xor,
+	}
+	dest, err := tcpServer.Start()
+	common.Must(err)
+	defer tcpServer.Close()
+
+	clientPort := tcp.PickPort()
+	cmdPort := tcp.PickPort()
+	clientConfig := &core.Config{
+		App: []*serial.TypedMessage{
+			serial.ToTypedMessage(&commander.Config{
+				Tag: "api",
+				Service: []*serial.TypedMessage{
+					serial.ToTypedMessage(&command.Config{}),
+				},
+			}),
+			serial.ToTypedMessage(&router.Config{
+				Rule: []*router.RoutingRule{
+					{
+						InboundTag: []string{"api"},
+						TargetTag: &router.RoutingRule_Tag{
+							Tag: "api",
+						},
+					},
+				},
+			}),
+		},
+		Inbound: []*core.InboundHandlerConfig{
+			{
+				Tag: "d",
+				ReceiverSettings: serial.ToTypedMessage(&proxyman.ReceiverConfig{
+					PortList: &net.PortList{Range: []*net.PortRange{net.SinglePortRange(clientPort)}},
+					Listen:   net.NewIPOrDomain(net.LocalHostIP),
+				}),
+				ProxySettings: serial.ToTypedMessage(&dokodemo.Config{
+					Address:  net.NewIPOrDomain(dest.Address),
+					Port:     uint32(dest.Port),
+					Networks: []net.Network{net.Network_TCP},
+				}),
+			},
+			{
+				Tag: "api",
+				ReceiverSettings: serial.ToTypedMessage(&proxyman.ReceiverConfig{
+					PortList: &net.PortList{Range: []*net.PortRange{net.SinglePortRange(cmdPort)}},
+					Listen:   net.NewIPOrDomain(net.LocalHostIP),
+				}),
+				ProxySettings: serial.ToTypedMessage(&dokodemo.Config{
+					Address:  net.NewIPOrDomain(dest.Address),
+					Port:     uint32(dest.Port),
+					Networks: []net.Network{net.Network_TCP},
+				}),
+			},
+		},
+		Outbound: []*core.OutboundHandlerConfig{
+			{
+				Tag:            "default-outbound",
+				SenderSettings: serial.ToTypedMessage(&proxyman.SenderConfig{}),
+				ProxySettings:  serial.ToTypedMessage(&freedom.Config{}),
+			},
+		},
+	}
+
+	servers, err := InitializeServerConfigs(clientConfig)
+	common.Must(err)
+	defer CloseAllServers(servers)
+
+	if err := testTCPConn(clientPort, 1024, time.Second*5)(); err != nil {
+		t.Fatal(err)
+	}
+
+	cmdConn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", cmdPort), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	common.Must(err)
+	defer cmdConn.Close()
+
+	hsClient := command.NewHandlerServiceClient(cmdConn)
+	inboundResp, err := hsClient.ListInbounds(context.Background(), &command.ListInboundsRequest{})
+	common.Must(err)
+	if inboundResp == nil {
+		t.Error("unexpected nil response")
+	}
+
+	if !cmp.Equal(inboundResp.Inbounds, clientConfig.Inbound, protocmp.Transform()) {
+		t.Fatal("inbound response doesn't match config")
+	}
+
+	outboundResp, err := hsClient.ListOutbounds(context.Background(), &command.ListOutboundsRequest{})
+	common.Must(err)
+	if outboundResp == nil {
+		t.Error("unexpected nil response")
+	}
+
+	if !cmp.Equal(outboundResp.Outbounds, clientConfig.Outbound, protocmp.Transform()) {
+		t.Fatal("outbound response doesn't match config")
 	}
 }
 

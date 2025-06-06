@@ -11,8 +11,6 @@
 
 这个fork在xray-core的基础上添加了以下api子命令：  
 ```bash
-geti          获取全部inbounds配置，以json格式输出
-geto          获取全部outbounds配置以json格式输出
 rmi           增加删除tag为空的inbound功能
 rmo           增加删除tag为空的outbound功能
 getr          获取routing配置，以json格式输出
