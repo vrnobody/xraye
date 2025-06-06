@@ -10,6 +10,7 @@
 
 #### exp #25
 更新 xray-core 至 v25.05.16（commit b80e3196）  
+移除 geti geto 命令，xray-core已添加相应命令  
 
 #### exp #24
 更新 xray-core 至 v25.04.30（commit 87ab8e5）  
