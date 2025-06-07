@@ -3,16 +3,19 @@
 版本信息修改：core\core.go  
 
 更新全部protobuf: 
-go run ./infra/vprotogen/main.go -pwd .
+`go run ./infra/vprotogen/main.go -pwd .`
 
 查看差异文件名：
 `git diff origin/main --name-only | grep -v -P "\.pb\.go$" | less`  
 
 #### protobuf
 ```bash
-# 安装protoc
-go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
-go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+# 安装 protoc-gen
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+# 下载protoc，解压到$PATH的任意可执行目录内
+https://github.com/protocolbuffers/protobuf/releases/download/v28.2/protoc-28.2-linux-x86_64.zip
 
 # 更新单个 proto
 go generate core/proto.go  
