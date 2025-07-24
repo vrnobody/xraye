@@ -9,7 +9,7 @@
 ### 详细更新记录
 
 #### exp #26
-更新 xray-core 至 v25.07.24（commit ）  
+更新 xray-core 至 v25.07.24（commit 4f45c5fa）  
 
 #### exp #25
 更新 xray-core 至 v25.05.16（commit b80e3196）  
