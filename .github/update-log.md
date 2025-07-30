@@ -1,5 +1,5 @@
 ### 和XTLS/xray-core的区别
-添加多个API功能，详见[wiki](https://github.com/vrnobody/xraye/wiki)  
+修改一些API命令，详见[wiki](https://github.com/vrnobody/xraye/wiki)  
 移除wireguard相关协议  
 移除shadowsocks相关协议  
 移除reverse功能  
@@ -7,6 +7,9 @@
 移除routing相关的adrules/rmrules/sib命令（和现有命令冲突）  
 
 ### 详细更新记录
+
+#### exp #27
+更新 xray-core 至 v25.07.26（commit c569f478）  
 
 #### exp #26
 更新 xray-core 至 v25.07.24（commit 4f45c5fa）  
