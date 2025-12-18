@@ -9,15 +9,19 @@
 [7]: https://img.shields.io/github/license/vrnobody/xraye.svg "Licence Badge"
 [8]: https://github.com/vrnobody/xraye/blob/main/LICENSE "Licence"
 
-xray-core v25.7.26 已实现这个 fork 的大部分功能。这个 fork 进入随缘更新状态。2025-07-30
+2025-07-30 xray-core v25.7.26 已实现这个 fork 的大部分功能。这个 fork 进入随缘更新状态。
 
-这个 fork 在 xray-core 的基础上添加了以下 API 子命令：  
+这个 fork 在 xray-core 的基础上添加了以下子命令：  
 ```bash
-rmi           增加删除tag为空的inbound功能
-rmo           增加删除tag为空的outbound功能
-getr          获取routing配置，以json格式输出
-setr          替换routing配置
+service   prober      大批量并发测速
+service   latency     对单个配置文件测速
+
+api       rmi         增加删除tag为空的inbound功能
+api       rmo         增加删除tag为空的outbound功能
+api       getr        获取routing配置，以json格式输出
+api       setr        替换routing配置
 ```
+
 [详细用法说明wiki](https://github.com/vrnobody/xraye/wiki)  
 [可执行文件下载](https://github.com/vrnobody/xraye/releases)  
 [更新日志](./.github/update-log.md)  

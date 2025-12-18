@@ -1,4 +1,5 @@
 ### 和XTLS/xray-core的区别
+添加 service prober 和 service latency 两个用于测速的子命令  
 修改一些 API 命令，详见 [wiki](https://github.com/vrnobody/xraye/wiki)  
 移除 wireguard 相关协议  
 移除 shadowsocks 相关协议  
@@ -9,8 +10,9 @@
 
 ### 详细更新记录
 
-#### exp #28
+#### exp #28 (2025-12-20)
 更新 xray-core 至 v25.12.8 (commit 81f8f398)  
+添加 service prober 和 service latency 两个用于测速的子命令  
 
 #### exp #27
 更新 xray-core 至 v25.07.26（commit c569f478）  
