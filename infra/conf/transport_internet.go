@@ -289,8 +289,8 @@ func (c *SplitHTTPConfig) Build() (proto.Message, error) {
 		return nil, errors.New("maxConnections cannot be specified together with maxConcurrency")
 	}
 	if c.Xmux == (XmuxConfig{}) {
-		c.Xmux.MaxConcurrency.From = 16
-		c.Xmux.MaxConcurrency.To = 32
+		c.Xmux.MaxConcurrency.From = 1
+		c.Xmux.MaxConcurrency.To = 1
 		c.Xmux.HMaxRequestTimes.From = 600
 		c.Xmux.HMaxRequestTimes.To = 900
 		c.Xmux.HMaxReusableSecs.From = 1800
@@ -412,8 +412,10 @@ type TLSConfig struct {
 	MasterKeyLog                         string           `json:"masterKeyLog"`
 	ServerNameToVerify                   string           `json:"serverNameToVerify"`
 	VerifyPeerCertInNames                []string         `json:"verifyPeerCertInNames"`
-	ECHConfigList                        string           `json:"echConfigList"`
 	ECHServerKeys                        string           `json:"echServerKeys"`
+	ECHConfigList                        string           `json:"echConfigList"`
+	ECHForceQuery                        string           `json:"echForceQuery"`
+	ECHSocketSettings                    *SocketConfig    `json:"echSockopt"`
 }
 
 // Build implements Buildable.
@@ -437,7 +439,7 @@ func (c *TLSConfig) Build() (proto.Message, error) {
 	}
 	if len(config.NextProtocol) > 1 {
 		for _, p := range config.NextProtocol {
-			if tcp.IsFromMitm(p) {
+			if tls.IsFromMitm(p) {
 				return nil, errors.New(`only one element is allowed in "alpn" when using "fromMitm" in it`)
 			}
 		}
@@ -485,14 +487,27 @@ func (c *TLSConfig) Build() (proto.Message, error) {
 	}
 	config.VerifyPeerCertInNames = c.VerifyPeerCertInNames
 
-	config.EchConfigList = c.ECHConfigList
-
 	if c.ECHServerKeys != "" {
 		EchPrivateKey, err := base64.StdEncoding.DecodeString(c.ECHServerKeys)
 		if err != nil {
 			return nil, errors.New("invalid ECH Config", c.ECHServerKeys)
 		}
 		config.EchServerKeys = EchPrivateKey
+	}
+	switch c.ECHForceQuery {
+	case "none", "half", "full", "":
+		config.EchForceQuery = c.ECHForceQuery
+	default:
+		return nil, errors.New(`invalid "echForceQuery": `, c.ECHForceQuery)
+	}
+	config.EchForceQuery = c.ECHForceQuery
+	config.EchConfigList = c.ECHConfigList
+	if c.ECHSocketSettings != nil {
+		ss, err := c.ECHSocketSettings.Build()
+		if err != nil {
+			return nil, errors.New("Failed to build ech sockopt.").Base(err)
+		}
+		config.EchSocketSettings = ss
 	}
 
 	return config, nil
@@ -613,6 +628,9 @@ func (c *REALITYConfig) Build() (proto.Message, error) {
 		}
 		config.ShortIds = make([][]byte, len(c.ShortIds))
 		for i, s := range c.ShortIds {
+			if len(s) > 16 {
+				return nil, errors.New(`too long "shortIds[`, i, `]": `, s)
+			}
 			config.ShortIds[i] = make([]byte, 8)
 			if _, err = hex.Decode(config.ShortIds[i], []byte(s)); err != nil {
 				return nil, errors.New(`invalid "shortIds[`, i, `]": `, s)
@@ -663,6 +681,9 @@ func (c *REALITYConfig) Build() (proto.Message, error) {
 		}
 		if len(c.ShortIds) != 0 {
 			return nil, errors.New(`non-empty "shortIds", please use "shortId" instead`)
+		}
+		if len(c.ShortIds) > 16 {
+			return nil, errors.New(`too long "shortId": `, c.ShortId)
 		}
 		config.ShortId = make([]byte, 8)
 		if _, err = hex.Decode(config.ShortId, []byte(c.ShortId)); err != nil {
@@ -789,6 +810,7 @@ type SocketConfig struct {
 	CustomSockopt         []*CustomSockoptConfig `json:"customSockopt"`
 	AddressPortStrategy   string                 `json:"addressPortStrategy"`
 	HappyEyeballsSettings *HappyEyeballsConfig   `json:"happyEyeballs"`
+	TrustedXForwardedFor  []string               `json:"trustedXForwardedFor"`
 }
 
 // Build implements Buildable.
@@ -908,6 +930,7 @@ func (c *SocketConfig) Build() (*internet.SocketConfig, error) {
 		CustomSockopt:        customSockopts,
 		AddressPortStrategy:  addressPortStrategy,
 		HappyEyeballs:        happyEyeballs,
+		TrustedXForwardedFor: c.TrustedXForwardedFor,
 	}, nil
 }
 

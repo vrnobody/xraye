@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"context"
 	gotls "crypto/tls"
+	"encoding/base64"
 	"reflect"
+	"strings"
+	"sync"
 	"time"
 	"unsafe"
 
@@ -24,6 +27,7 @@ import (
 	"github.com/xtls/xray-core/proxy"
 	"github.com/xtls/xray-core/proxy/vless"
 	"github.com/xtls/xray-core/proxy/vless/encoding"
+	"github.com/xtls/xray-core/proxy/vless/encryption"
 	"github.com/xtls/xray-core/transport"
 	"github.com/xtls/xray-core/transport/internet"
 	"github.com/xtls/xray-core/transport/internet/reality"
@@ -39,76 +43,126 @@ func init() {
 
 // Handler is an outbound connection handler for VLess protocol.
 type Handler struct {
-	serverList    *protocol.ServerList
-	serverPicker  protocol.ServerPicker
+	server        *protocol.ServerSpec
 	policyManager policy.Manager
 	cone          bool
+	encryption    *encryption.ClientInstance
+
+	testpre  uint32
+	initpre  sync.Once
+	preConns chan *ConnExpire
+}
+
+type ConnExpire struct {
+	Conn   stat.Connection
+	Expire time.Time
 }
 
 // New creates a new VLess outbound handler.
 func New(ctx context.Context, config *Config) (*Handler, error) {
-	serverList := protocol.NewServerList()
-	for _, rec := range config.Vnext {
-		s, err := protocol.NewServerSpecFromPB(rec)
-		if err != nil {
-			return nil, errors.New("failed to parse server spec").Base(err).AtError()
-		}
-		serverList.AddServer(s)
+	if config.Vnext == nil {
+		return nil, errors.New(`no vnext found`)
+	}
+	server, err := protocol.NewServerSpecFromPB(config.Vnext)
+	if err != nil {
+		return nil, errors.New("failed to get server spec").Base(err).AtError()
 	}
 
 	v := core.MustFromContext(ctx)
 	handler := &Handler{
-		serverList:    serverList,
-		serverPicker:  protocol.NewRoundRobinServerPicker(serverList),
+		server:        server,
 		policyManager: v.GetFeature(policy.ManagerType()).(policy.Manager),
 		cone:          ctx.Value("cone").(bool),
 	}
 
+	a := handler.server.User.Account.(*vless.MemoryAccount)
+	if a.Encryption != "" && a.Encryption != "none" {
+		s := strings.Split(a.Encryption, ".")
+		var nfsPKeysBytes [][]byte
+		for _, r := range s {
+			b, _ := base64.RawURLEncoding.DecodeString(r)
+			nfsPKeysBytes = append(nfsPKeysBytes, b)
+		}
+		handler.encryption = &encryption.ClientInstance{}
+		if err := handler.encryption.Init(nfsPKeysBytes, a.XorMode, a.Seconds, a.Padding); err != nil {
+			return nil, errors.New("failed to use encryption").Base(err).AtError()
+		}
+	}
+
+	handler.testpre = a.Testpre
+
 	return handler, nil
+}
+
+// Close implements common.Closable.Close().
+func (h *Handler) Close() error {
+	if h.preConns != nil {
+		close(h.preConns)
+	}
+	return nil
 }
 
 // Process implements proxy.Outbound.Process().
 func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer internet.Dialer) error {
 	outbounds := session.OutboundsFromContext(ctx)
 	ob := outbounds[len(outbounds)-1]
-	if !ob.Target.IsValid() {
+	if !ob.Target.IsValid() && ob.Target.Address.String() != "v1.rvs.cool" {
 		return errors.New("target not specified").AtError()
 	}
 	ob.Name = "vless"
 
-	var rec *protocol.ServerSpec
+	rec := h.server
 	var conn stat.Connection
-	if err := retry.ExponentialBackoff(5, 200).On(func() error {
-		rec = h.serverPicker.PickServer()
-		var err error
-		conn, err = dialer.Dial(ctx, rec.Destination())
-		if err != nil {
-			return err
+
+	if conn == nil {
+		if err := retry.ExponentialBackoff(5, 200).On(func() error {
+			var err error
+			conn, err = dialer.Dial(ctx, rec.Destination)
+			if err != nil {
+				return err
+			}
+			return nil
+		}); err != nil {
+			return errors.New("failed to find an available destination").Base(err).AtWarning()
 		}
-		return nil
-	}); err != nil {
-		return errors.New("failed to find an available destination").Base(err).AtWarning()
 	}
 	defer conn.Close()
+
+	ob.Conn = conn // for Vision's pre-connect
 
 	iConn := conn
 	if statConn, ok := iConn.(*stat.CounterConnection); ok {
 		iConn = statConn.Connection
 	}
 	target := ob.Target
-	errors.LogInfo(ctx, "tunneling request to ", target, " via ", rec.Destination().NetAddr())
+	errors.LogInfo(ctx, "tunneling request to ", target, " via ", rec.Destination.NetAddr())
+
+	if h.encryption != nil {
+		var err error
+		if conn, err = h.encryption.Handshake(conn); err != nil {
+			return errors.New("ML-KEM-768 handshake failed").Base(err).AtInfo()
+		}
+	}
 
 	command := protocol.RequestCommandTCP
 	if target.Network == net.Network_UDP {
 		command = protocol.RequestCommandUDP
 	}
-	if target.Address.Family().IsDomain() && target.Address.Domain() == "v1.mux.cool" {
-		command = protocol.RequestCommandMux
+	if target.Address.Family().IsDomain() {
+		switch target.Address.Domain() {
+		case "v1.mux.cool":
+			command = protocol.RequestCommandMux
+		case "v1.rvs.cool":
+			if target.Network != net.Network_Unknown {
+				return errors.New("nice try baby").AtError()
+			}
+			command = protocol.RequestCommandRvs
+		}
 	}
 
 	request := &protocol.RequestHeader{
 		Version: encoding.Version,
-		User:    rec.PickUser(),
+		User:    rec.User,
 		Command: command,
 		Address: target.Address,
 		Port:    target.Port,
@@ -137,10 +191,16 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			}
 		case protocol.RequestCommandMux:
 			fallthrough // let server break Mux connections that contain TCP requests
-		case protocol.RequestCommandTCP:
+		case protocol.RequestCommandTCP, protocol.RequestCommandRvs:
 			var t reflect.Type
 			var p uintptr
-			if tlsConn, ok := iConn.(*tls.Conn); ok {
+			if commonConn, ok := conn.(*encryption.CommonConn); ok {
+				if _, ok := commonConn.Conn.(*encryption.XorConn); ok || !proxy.IsRAWTransportWithoutSecurity(iConn) {
+					ob.CanSpliceCopy = 3 // full-random xorConn / non-RAW transport / another securityConn should not be penetrated
+				}
+				t = reflect.TypeOf(commonConn).Elem()
+				p = uintptr(unsafe.Pointer(commonConn))
+			} else if tlsConn, ok := iConn.(*tls.Conn); ok {
 				t = reflect.TypeOf(tlsConn.Conn).Elem()
 				p = uintptr(unsafe.Pointer(tlsConn.Conn))
 			} else if utlsConn, ok := iConn.(*tls.UConn); ok {
@@ -156,6 +216,8 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			r, _ := t.FieldByName("rawInput")
 			input = (*bytes.Reader)(unsafe.Pointer(p + i.Offset))
 			rawInput = (*bytes.Buffer)(unsafe.Pointer(p + r.Offset))
+		default:
+			panic("unknown VLESS request command")
 		}
 	default:
 		ob.CanSpliceCopy = 3
@@ -194,7 +256,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		}
 
 		// default: serverWriter := bufferWriter
-		serverWriter := encoding.EncodeBodyAddons(bufferWriter, request, requestAddons, trafficState, true, ctx)
+		serverWriter := encoding.EncodeBodyAddons(bufferWriter, request, requestAddons, trafficState, true, ctx, conn, ob)
 		if request.Command == protocol.RequestCommandMux && request.Port == 666 {
 			serverWriter = xudp.NewPacketWriter(serverWriter, target, xudp.GetGlobalID(ctx))
 		}
@@ -222,7 +284,6 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			return errors.New("failed to write A request payload").Base(err).AtWarning()
 		}
 
-		var err error
 		if requestAddons.Flow == vless.XRV {
 			if tlsConn, ok := iConn.(*tls.Conn); ok {
 				if tlsConn.ConnectionState().Version != gotls.VersionTLS13 {
@@ -233,12 +294,8 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 					return errors.New(`failed to use `+requestAddons.Flow+`, found outer tls version `, utlsConn.ConnectionState().Version).AtWarning()
 				}
 			}
-			ctx1 := session.ContextWithInbound(ctx, nil) // TODO enable splice
-			err = encoding.XtlsWrite(clientReader, serverWriter, timer, conn, trafficState, ob, true, ctx1)
-		} else {
-			// from clientReader.ReadMultiBuffer to serverWriter.WriteMultiBuffer
-			err = buf.Copy(clientReader, serverWriter, buf.UpdateActivity(timer))
 		}
+		err := buf.Copy(clientReader, serverWriter, buf.UpdateActivity(timer))
 		if err != nil {
 			return errors.New("failed to transfer request payload").Base(err).AtInfo()
 		}
@@ -261,7 +318,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		// default: serverReader := buf.NewReader(conn)
 		serverReader := encoding.DecodeBodyAddons(conn, request, responseAddons)
 		if requestAddons.Flow == vless.XRV {
-			serverReader = proxy.NewVisionReader(serverReader, trafficState, false, ctx)
+			serverReader = proxy.NewVisionReader(serverReader, trafficState, false, ctx, conn, input, rawInput, ob)
 		}
 		if request.Command == protocol.RequestCommandMux && request.Port == 666 {
 			if requestAddons.Flow == vless.XRV {
@@ -272,7 +329,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		}
 
 		if requestAddons.Flow == vless.XRV {
-			err = encoding.XtlsRead(serverReader, clientWriter, timer, conn, input, rawInput, trafficState, ob, false, ctx)
+			err = encoding.XtlsRead(serverReader, clientWriter, timer, conn, trafficState, false, ctx)
 		} else {
 			// from serverReader.ReadMultiBuffer to clientWriter.WriteMultiBuffer
 			err = buf.Copy(serverReader, clientWriter, buf.UpdateActivity(timer))

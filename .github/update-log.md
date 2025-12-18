@@ -1,12 +1,16 @@
 ### 和XTLS/xray-core的区别
-修改一些API命令，详见[wiki](https://github.com/vrnobody/xraye/wiki)  
-移除wireguard相关协议  
-移除shadowsocks相关协议  
-移除reverse功能  
-移除yaml/toml配置格式，只支持json配置格式  
-移除routing相关的adrules/rmrules/sib命令（和现有命令冲突）  
+修改一些 API 命令，详见 [wiki](https://github.com/vrnobody/xraye/wiki)  
+移除 wireguard 相关协议  
+移除 shadowsocks 相关协议  
+移除 reverse 功能  
+移除 vless 的 reverse 功能  
+移除 yaml/toml 配置格式，只支持json配置格式  
+移除 routing 相关的 adrules/rmrules/sib 命令（和现有命令冲突）  
 
 ### 详细更新记录
+
+#### exp #28
+更新 xray-core 至 v25.12.8 (commit 81f8f398)  
 
 #### exp #27
 更新 xray-core 至 v25.07.26（commit c569f478）  
