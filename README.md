@@ -9,9 +9,9 @@
 [7]: https://img.shields.io/github/license/vrnobody/xraye.svg "Licence Badge"
 [8]: https://github.com/vrnobody/xraye/blob/main/LICENSE "Licence"
 
-xray-core v25.7.26 已实现这个fork的大部分功能。这个fork进入随缘更新状态。2025-07-30
+xray-core v25.7.26 已实现这个 fork 的大部分功能。这个 fork 进入随缘更新状态。2025-07-30
 
-这个fork在xray-core的基础上添加了以下api子命令：  
+这个 fork 在 xray-core 的基础上添加了以下 API 子命令：  
 ```bash
 rmi           增加删除tag为空的inbound功能
 rmo           增加删除tag为空的outbound功能
@@ -22,5 +22,5 @@ setr          替换routing配置
 [可执行文件下载](https://github.com/vrnobody/xraye/releases)  
 [更新日志](./.github/update-log.md)  
   
-这个fork遵循Mozilla Public License Version 2.0协议，简单来说你想怎么用都行。  
-原版[README.md](./README-xtls.md)  
+这个 fork 遵循 Mozilla Public License Version 2.0 协议，简单来说你想怎么用都行。  
+原版 [README.md](./README-xtls.md)  
