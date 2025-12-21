@@ -33,9 +33,6 @@ Arguments:
     --auth <password>
         Upstream server password.
 
-    -r, --retry <num>
-        Retry times when encounter some weird problem.
-
 Examples:
 
     {{.Exec}} service prober -w 1 -u http://localhost:4001 --auth="123456"
@@ -45,14 +42,12 @@ Examples:
 
 func executeRun(cmd *base.Command, args []string) {
 	var url, auth string
-	var wnum, rnum int
+	var wnum int
 	cmd.Flag.StringVar(&url, "u", "http://localhost:4001/", "")
 	cmd.Flag.StringVar(&url, "url", "http://localhost:4001/", "")
 	cmd.Flag.StringVar(&auth, "auth", "", "")
 	cmd.Flag.IntVar(&wnum, "w", 1, "")
 	cmd.Flag.IntVar(&wnum, "workers", 1, "")
-	cmd.Flag.IntVar(&rnum, "r", 1, "")
-	cmd.Flag.IntVar(&rnum, "retry", 1, "")
 	cmd.Flag.Parse(args)
 
 	mlog := &Logger{
@@ -64,7 +59,7 @@ func executeRun(cmd *base.Command, args []string) {
 	}
 	mlog.Info("prober starts")
 	var ctx, cancel = context.WithCancel(context.Background())
-	wg, err := startWorkers(ctx, upstream, wnum, rnum)
+	wg, err := startWorkers(ctx, upstream, wnum)
 	if err != nil {
 		mlog.Error(err)
 		cancel()
@@ -75,7 +70,7 @@ func executeRun(cmd *base.Command, args []string) {
 	mlog.Info("prober stopped")
 }
 
-func startWorkers(ctx context.Context, upstream *Upstream, wnum int, retry int) (*sync.WaitGroup, error) {
+func startWorkers(ctx context.Context, upstream *Upstream, wnum int) (*sync.WaitGroup, error) {
 	if wnum < 1 {
 		return nil, errors.New("workers number must larger than 0")
 	}
@@ -86,7 +81,7 @@ func startWorkers(ctx context.Context, upstream *Upstream, wnum int, retry int) 
 				loglevel: Loglevel_Info,
 				tag:      fmt.Sprintf("[w%d]", i),
 			}
-			worker(ctx, wlog, upstream, retry)
+			worker(ctx, wlog, upstream)
 		})
 	}
 	return &wg, nil
@@ -100,22 +95,11 @@ func watchSigTerm(mlog *Logger, cancel context.CancelFunc) {
 	cancel()
 }
 
-func doWork(wlog *Logger, resp *Response, retry int) *Request {
+func doWork(wlog *Logger, resp *Response) *Request {
 	wlog.Info("uid: ", resp.Uid, ", probe: ", resp.Url)
-	for r := range retry {
-		if r > 0 {
-			wlog.Info("uid: ", resp.Uid, ", retry: ", r)
-		}
-		req, err := probe(wlog, resp)
-		if err != nil {
-			wlog.Warn("uid: ", resp.Uid, ", error: ", err)
-			continue
-		}
-		wlog.Info(req)
-		return req
-	}
-
-	if retry > 0 {
+	req, err := probe(wlog, resp)
+	if err != nil {
+		wlog.Warn("uid: ", resp.Uid, ", error: ", err)
 		// timeout
 		return &Request{
 			Uid: resp.Uid,
@@ -123,12 +107,11 @@ func doWork(wlog *Logger, resp *Response, retry int) *Request {
 			Avg: 0,
 		}
 	}
-
-	// pass
-	return &Request{}
+	wlog.Info(req)
+	return req
 }
 
-func worker(ctx context.Context, wlog *Logger, upstream *Upstream, retry int) {
+func worker(ctx context.Context, wlog *Logger, upstream *Upstream) {
 	wlog.Info("starts")
 	defer wlog.Info("stopped")
 	req := &Request{}
@@ -151,7 +134,7 @@ func worker(ctx context.Context, wlog *Logger, upstream *Upstream, retry int) {
 			} else if !resp.Ok {
 				wlog.Warn("upstream error: ", resp.Msg)
 			} else {
-				req = doWork(wlog, resp, retry)
+				req = doWork(wlog, resp)
 			}
 			if err != nil || !resp.Ok || !req.Ok {
 				time.Sleep(2 * time.Second)

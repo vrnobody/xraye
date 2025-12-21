@@ -21,7 +21,7 @@ type Request struct {
 }
 
 func (r *Request) String() string {
-	return fmt.Sprintf("uid: %s, ok: %t, avg: %d, latency: %s", r.Uid, r.Ok, r.Avg, serial.Concat(r.Latency))
+	return fmt.Sprintf("uid: %s, ok: %t, avg: %dms, latency: %s", r.Uid, r.Ok, r.Avg, serial.Concat(r.Latency))
 }
 
 type Response struct {
