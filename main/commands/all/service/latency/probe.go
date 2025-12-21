@@ -112,18 +112,15 @@ func probe(wlog *Logger, resp *Response) (*Request, error) {
 	for i := 0; i < resp.Cycle; i++ {
 		dur, err := doGetRequest(httpClient, req, resp)
 		if err != nil {
-			if len(resp.Uid) > 0 {
-				wlog.Warn(fmt.Sprintf("uid: %s, round: %d, error: %s", resp.Uid, i+1, err))
-			} else {
-				wlog.Warn(fmt.Sprintf("round: %d, error: %s", i+1, err))
-			}
+			logIf(wlog.Warn, resp.Uid, fmt.Sprintf("round: %d, error: %s", i+1, err))
 			continue
 		}
 
 		if dur > 0 {
 			durs = append(durs, dur)
 			avg = calcAvg(avg, dur)
-			wlog.Debug(fmt.Sprintf("round: %d, current: %dms, latency: %s", i+1, avg, serial.Concat(durs)))
+			tail := fmt.Sprintf("round: %d, avg: %dms, latency: %s", i+1, avg, serial.Concat(durs))
+			logIf(wlog.Debug, resp.Uid, tail)
 		}
 	}
 

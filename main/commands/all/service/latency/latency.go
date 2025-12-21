@@ -88,5 +88,5 @@ func executeCmdLatency(cmd *base.Command, args []string) {
 		return
 	}
 
-	log.Info(fmt.Sprintf("result: %dms, latency: %s", r.Avg, serial.Concat(r.Latency)))
+	log.Info(fmt.Sprintf("average: %dms, latency: %s", r.Avg, serial.Concat(r.Latency)))
 }
