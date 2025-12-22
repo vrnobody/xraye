@@ -9,17 +9,15 @@
 [7]: https://img.shields.io/github/license/vrnobody/xraye.svg "Licence Badge"
 [8]: https://github.com/vrnobody/xraye/blob/main/LICENSE "Licence"
 
-2025-07-30 xray-core v25.7.26 已实现这个 fork 的大部分功能。这个 fork 进入随缘更新状态。
-
 这个 fork 在 xray-core 的基础上添加了以下子命令：  
 ```bash
-service   prober      大批量并发测速
-service   latency     对单个配置文件测速
+service   prober      高并发批量测速
+service   latency     测速单个配置文件
 
-api       rmi         增加删除tag为空的inbound功能
-api       rmo         增加删除tag为空的outbound功能
-api       getr        获取routing配置，以json格式输出
-api       setr        替换routing配置
+api       rmi         增加删除 tag 为空的 inbound 功能
+api       rmo         增加删除 tag 为空的 outbound 功能
+api       getr        获取 routing 配置，以 json 格式输出
+api       setr        替换 routing 配置
 ```
 
 [详细用法说明wiki](https://github.com/vrnobody/xraye/wiki)  
@@ -28,3 +26,4 @@ api       setr        替换routing配置
   
 这个 fork 遵循 Mozilla Public License Version 2.0 协议，简单来说你想怎么用都行。  
 原版 [README.md](./README-xtls.md)  
+
