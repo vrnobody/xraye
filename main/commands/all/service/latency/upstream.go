@@ -30,6 +30,7 @@ type Response struct {
 	Msg       string `json:"msg"`
 	Shutdown  bool   `json:"shutdown"`
 	Config    string `json:"config"`
+	Keep      bool   `json:"keep"`
 	Cycle     int    `json:"cycle"`
 	UserAgent string `json:"userAgent"`
 	Timeout   int64  `json:"timeout"`

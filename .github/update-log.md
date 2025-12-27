@@ -10,6 +10,9 @@
 
 ### 详细更新记录
 
+#### exp #29 (2025-12-20)
+service latency 添加 keep 命令行参数  
+
 #### exp #28 (2025-12-20)
 更新 xray-core 至 v25.12.8 (commit 81f8f398)  
 添加 service prober 和 service latency 两个用于测速的子命令  

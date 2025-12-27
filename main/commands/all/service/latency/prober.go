@@ -16,11 +16,11 @@ import (
 var CmdProber = &base.Command{
 	CustomFlags: true,
 	UsageLine:   "{{.Exec}} service prober [--workers=1] [--url=http://localhost:4001/] [--auth=passwrod]",
-	Short:       "Batch latency tests.",
+	Short:       "Batch latency tester.",
 	Long: `
-Batch latency tests.
+Batch latency tester.
 
-There is a tutorial on how to setup upstream server in GitHub wiki pages.
+There is a tutorial on how to setup a upstream server in GitHub wiki pages.
 
 Arguments:
 

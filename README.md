@@ -20,6 +20,8 @@ api       getr        获取 routing 配置，以 json 格式输出
 api       setr        替换 routing 配置
 ```
 
+移除了 wireguard，shadowsocks，reverse 等功能，详见下面的更新日志。
+
 [详细用法说明wiki](https://github.com/vrnobody/xraye/wiki)  
 [可执行文件下载](https://github.com/vrnobody/xraye/releases)  
 [更新日志](./.github/update-log.md)  

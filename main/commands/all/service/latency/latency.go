@@ -26,6 +26,9 @@ Arguments:
     --cycle
         Perform n rounds of latency test. Default 1.
 
+    --keep
+        Keep config.json as-is. Default false means to remove inbounds section of config.json.
+
     --explen
         Expected html text length. Default zero means to download the entire web page.
 
@@ -43,14 +46,15 @@ func executeCmdLatency(cmd *base.Command, args []string) {
 
 	var url string
 	var timeout int64
-	var cycle int
-	var explen int
+	var cycle, explen int
+	var keep bool
 	var useragent string
 
 	cmd.Flag.StringVar(&url, "url", "https://www.google.com/", "")
 	cmd.Flag.Int64Var(&timeout, "timeout", 10000, "")
 	cmd.Flag.IntVar(&cycle, "cycle", 1, "")
 	cmd.Flag.IntVar(&explen, "explen", 0, "")
+	cmd.Flag.BoolVar(&keep, "keep", false, "")
 	cmd.Flag.StringVar(&useragent, "useragent", "", "")
 	cmd.Flag.Parse(args)
 
@@ -71,6 +75,7 @@ func executeCmdLatency(cmd *base.Command, args []string) {
 		Uid:       "",
 		Ok:        true,
 		Config:    string(b),
+		Keep:      keep,
 		Cycle:     cycle,
 		UserAgent: useragent,
 		Timeout:   timeout,

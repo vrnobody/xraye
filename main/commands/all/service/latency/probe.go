@@ -17,18 +17,25 @@ import (
 	"github.com/xtls/xray-core/core"
 )
 
-func startHeadlessInstance(cfg string) (*core.Instance, error) {
+func startHeadlessInstance(cfg string, keep bool) (*core.Instance, error) {
 	config, err := core.LoadConfig("json", bytes.NewBufferString(cfg))
 	if err != nil {
 		return nil, err
 	}
-	config.Inbound = []*core.InboundHandlerConfig{}
+
+	if !keep {
+		// remove inbounds section of config.json
+		config.Inbound = []*core.InboundHandlerConfig{}
+	}
+
 	instance, err := core.New(config)
 	if err != nil {
 		return nil, err
 	}
+
 	// disable logging
 	clog.ReplaceWithSeverityLogger(clog.Severity_Unknown)
+
 	if err := instance.Start(); err != nil {
 		return nil, err
 	}
@@ -91,7 +98,7 @@ func createGetRequest(resp *Response) (*http.Request, error) {
 }
 
 func probe(wlog *Logger, resp *Response) (*Request, error) {
-	xray, err := startHeadlessInstance(resp.Config)
+	xray, err := startHeadlessInstance(resp.Config, resp.Keep)
 	if err != nil {
 		return nil, err
 	}

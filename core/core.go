@@ -24,7 +24,7 @@ var (
 
 var (
 	build    = "Custom"
-	expWarn  = "Experimental #28"
+	expWarn  = "Experimental #29"
 	codename = "Xray, Penetrates Everything."
 	intro    = "A unified platform for anti-censorship."
 )
