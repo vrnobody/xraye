@@ -191,9 +191,12 @@ jobs:
           body: >
             [\[使用说明\]](https://github.com/vrnobody/xraye/wiki)
             [\[更新日志\]](https://github.com/vrnobody/xraye/blob/main/.github/update-log.md)
-            [\[GitHub action\]](https://github.com/vrnobody/xraye/actions/runs/${{ github.run_id }})  
-            发布文件不包含 `geoip.dat`, `geosite.dat`, `wintun.dll` 等资源文件。  
-            如有需要请到 [Xray-core](https://github.com/XTLS/Xray-core) 项目下载。  
+            [\[GitHub action\]](https://github.com/vrnobody/xraye/actions/runs/${{ github.run_id }})
+
+            
+            发布文件不包含 `geoip.dat`, `geosite.dat`, `wintun.dll` 等资源文件。
+            
+            如有需要请到 [Xray-core](https://github.com/XTLS/Xray-core) 项目下载。
           draft: false
           prerelease: false
           artifacts: "Xray-*.zip*"
