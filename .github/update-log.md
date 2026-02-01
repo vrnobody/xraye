@@ -1,4 +1,4 @@
-### 和XTLS/xray-core的区别
+### 功能区别
 添加 service prober 和 service latency 两个用于测速的子命令  
 修改一些 API 命令，详见 [wiki](https://github.com/vrnobody/xraye/wiki)  
 移除 wireguard 相关协议  
@@ -7,6 +7,10 @@
 移除 vless 的 reverse 功能  
 移除 yaml/toml 配置格式，只支持json配置格式  
 移除 routing 相关的 adrules/rmrules/sib 命令（和现有命令冲突）  
+
+### 发布文件的区别
+发布文件不包含 `geoip.dat`, `geosite.dat`, `wintun.dll` 等资源文件  
+如有需要请到 [Xray-core](https://github.com/XTLS/Xray-core) 项目下载并复制过来  
 
 ### 详细更新记录
 

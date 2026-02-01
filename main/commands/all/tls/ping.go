@@ -3,7 +3,7 @@ package tls
 import (
 	gotls "crypto/tls"
 	"crypto/x509"
-	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"net"
 	"strconv"
@@ -75,8 +75,6 @@ func executePing(cmd *base.Command, args []string) {
 			NextProtos:         []string{"h2", "http/1.1"},
 			MaxVersion:         gotls.VersionTLS13,
 			MinVersion:         gotls.VersionTLS12,
-			// Do not release tool before v5's refactor
-			// VerifyPeerCertificate: showCert(),
 		})
 		err = tlsConn.Handshake()
 		if err != nil {
@@ -101,8 +99,6 @@ func executePing(cmd *base.Command, args []string) {
 			NextProtos: []string{"h2", "http/1.1"},
 			MaxVersion: gotls.VersionTLS13,
 			MinVersion: gotls.VersionTLS12,
-			// Do not release tool before v5's refactor
-			// VerifyPeerCertificate: showCert(),
 		})
 		err = tlsConn.Handshake()
 		if err != nil {
@@ -133,6 +129,7 @@ func printCertificates(certs []*x509.Certificate) {
 		fmt.Println("Cert's signature algorithm: ", leaf.SignatureAlgorithm.String())
 		fmt.Println("Cert's publicKey algorithm: ", leaf.PublicKeyAlgorithm.String())
 		fmt.Println("Cert's allowed domains: ", leaf.DNSNames)
+		fmt.Println("Cert's leaf SHA256: ", hex.EncodeToString(GenerateCertHash(leaf)))
 	}
 }
 
@@ -151,13 +148,5 @@ func printTLSConnDetail(tlsConn *gotls.Conn) {
 		fmt.Println("TLS Post-Quantum key exchange: ", PostQuantum, "("+curveID.String()+")")
 	} else {
 		fmt.Println("TLS Post-Quantum key exchange:  false (RSA Exchange)")
-	}
-}
-
-func showCert() func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-	return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-		hash := GenerateCertChainHash(rawCerts)
-		fmt.Println("Certificate Chain Hash: ", base64.StdEncoding.EncodeToString(hash))
-		return nil
 	}
 }

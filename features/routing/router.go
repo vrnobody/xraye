@@ -66,6 +66,11 @@ func (DefaultRouter) SetRoutingConfig(*cserial.TypedMessage) error {
 	return common.ErrNoClue
 }
 
+// ListRule implements Router.
+func (DefaultRouter) ListRule() []Route {
+	return nil
+}
+
 // Start implements common.Runnable.
 func (DefaultRouter) Start() error {
 	return nil
