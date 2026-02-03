@@ -19,7 +19,6 @@ MAIN = ./main
 PREFIX ?= $(shell go env GOPATH)
 ifeq ($(GOOS),windows)
 OUTPUT = $(NAME).exe
-ADDITION = go build -o w$(NAME).exe -trimpath -ldflags "-H windowsgui $(LDFLAGS)" -v $(MAIN)
 else
 OUTPUT = $(NAME)
 endif
@@ -34,4 +33,4 @@ build:
 
 clean:
 	go clean -v -i $(PWD)
-	rm -f xray xray.exe wxray.exe xray_softfloat
+	rm -f xray xray.exe xray_softfloat
