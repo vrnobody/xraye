@@ -15,8 +15,8 @@ git diff origin/main --name-only | grep -v -P "\.pb\.go$" | less
 #### protobuf
 ```bash
 # 安装 protoc-gen
-go install -v google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1
-go install -v google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+go install -v google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11
+go install -v google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.0
 
 # 下载protoc，解压到$PATH的任意可执行目录内
 https://github.com/protocolbuffers/protobuf/releases/download/v28.2/protoc-28.2-linux-x86_64.zip
