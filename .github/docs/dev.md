@@ -1,5 +1,8 @@
 #### golang
-修改go.mod后执行`go mod tidy`更新go.sum  
+修改go.mod后执行：
+```bash
+go mod tidy
+```
 版本信息修改：core\core.go  
 
 更新全部protobuf:  
