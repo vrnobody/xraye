@@ -95,17 +95,25 @@ func watchSigTerm(mlog *Logger, cancel context.CancelFunc) {
 	cancel()
 }
 
-func doWork(wlog *Logger, resp *Response) *Request {
+func doWork(wlog *Logger, resp *Response) (req *Request) {
+	timeout := &Request{
+		Uid: resp.Uid,
+		Ok:  true,
+		Avg: 0,
+	}
+
+	defer func() {
+		if err := recover(); err != nil {
+			wlog.Warn("uid: ", resp.Uid, ", panic: ", err)
+			req = timeout
+		}
+	}()
+
 	wlog.Info("uid: ", resp.Uid, ", probe: ", resp.Url)
 	req, err := probe(wlog, resp)
 	if err != nil {
 		wlog.Warn("uid: ", resp.Uid, ", error: ", err)
-		// timeout
-		return &Request{
-			Uid: resp.Uid,
-			Ok:  true,
-			Avg: 0,
-		}
+		return timeout
 	}
 	wlog.Info(req)
 	return req

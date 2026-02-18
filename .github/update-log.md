@@ -12,7 +12,10 @@
 发布文件不包含 `geoip.dat`, `geosite.dat`, `wintun.dll` 等资源文件  
 如有需要请到 [Xray-core](https://github.com/XTLS/Xray-core) 项目下载并复制过来  
 
-### 详细更
+### 详细更新记录
+#### exp #34（未发布）
+prober 子命令忽略内核 panic  
+
 #### exp #33 (2026-02-07)
 更新 xray-core 至 v26.2.6  
 
