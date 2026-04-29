@@ -23,7 +23,9 @@ import (
 	"github.com/xtls/xray-core/common/signal"
 	"github.com/xtls/xray-core/common/task"
 	"github.com/xtls/xray-core/core"
+	"github.com/xtls/xray-core/features"
 	"github.com/xtls/xray-core/features/dns"
+	"github.com/xtls/xray-core/features/extension"
 	feature_inbound "github.com/xtls/xray-core/features/inbound"
 	"github.com/xtls/xray-core/features/outbound"
 	"github.com/xtls/xray-core/features/policy"
@@ -74,6 +76,7 @@ type Handler struct {
 	validator              vless.Validator
 	decryption             *encryption.ServerInstance
 	outboundHandlerManager outbound.Manager
+	observer               features.Feature
 	defaultDispatcher      routing.Dispatcher
 	ctx                    context.Context
 	fallbacks              map[string]map[string]map[string]*Fallback // or nil
@@ -89,6 +92,7 @@ func New(ctx context.Context, config *Config, dc dns.Client, validator vless.Val
 		stats:                  v.GetFeature(stats.ManagerType()).(stats.Manager),
 		validator:              validator,
 		outboundHandlerManager: v.GetFeature(outbound.ManagerType()).(outbound.Manager),
+		observer:               v.GetFeature(extension.ObservatoryType()),
 		defaultDispatcher:      v.GetFeature(routing.DispatcherType()).(routing.Dispatcher),
 		ctx:                    ctx,
 	}

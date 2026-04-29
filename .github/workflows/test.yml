@@ -18,7 +18,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Restore Geodat Cache
         uses: actions/cache/restore@v5
         with:
@@ -27,7 +26,7 @@ jobs:
 
       - name: Update Geodat
         id: update-geodat
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4
         with:
           timeout_minutes: 60
           retry_wait_seconds: 60
@@ -76,7 +75,7 @@ jobs:
         os: [windows-latest, ubuntu-latest]
     steps:
       - name: Checkout codebase
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: main
 
@@ -87,7 +86,7 @@ jobs:
           check-latest: true
 
       - name: Restore Geodat Cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: resources
           key: xray-geodat-

@@ -83,16 +83,29 @@ func (r *Router) Reload(config *Config) error {
 	for _, rule := range config.Rule {
 		cond, err := rule.BuildCondition()
 		if err != nil {
+			r.closeWebhooks()
 			return err
 		}
 		rr := &Rule{
 			Condition: cond,
 			Tag:       rule.GetTag(),
 		}
+		if wh := rule.GetWebhook(); wh != nil {
+			notifier, err := NewWebhookNotifier(wh)
+			if err != nil {
+				r.closeWebhooks()
+				return err
+			}
+			rr.Webhook = notifier
+		}
 		btag := rule.GetBalancingTag()
 		if len(btag) > 0 {
 			brule, found := balancers[btag]
 			if !found {
+				if rr.Webhook != nil {
+					rr.Webhook.Close()
+				}
+				r.closeWebhooks()
 				return errors.New("balancer ", btag, " not found")
 			}
 			rr.Balancer = brule
@@ -109,6 +122,7 @@ func (r *Router) Reload(config *Config) error {
 
 // PickRoute implements routing.Router.
 func (r *Router) PickRoute(ctx routing.Context) (routing.Route, error) {
+	originalCtx := ctx
 	rule, ctx, err := r.pickRouteInternal(ctx)
 	if err != nil {
 		return nil, err
@@ -116,6 +130,9 @@ func (r *Router) PickRoute(ctx routing.Context) (routing.Route, error) {
 	tag, err := rule.GetTag()
 	if err != nil {
 		return nil, err
+	}
+	if rule.Webhook != nil {
+		rule.Webhook.Fire(originalCtx, tag)
 	}
 	return &Route{Context: ctx, outboundTag: tag, ruleTag: rule.RuleTag}, nil
 }
@@ -157,8 +174,20 @@ func (r *Router) Start() error {
 	return nil
 }
 
+// closeWebhooks closes all webhook notifiers in the current rule set.
+func (r *Router) closeWebhooks() {
+	for _, rule := range r.rules {
+		if rule.Webhook != nil {
+			rule.Webhook.Close()
+		}
+	}
+}
+
 // Close implements common.Closable.
 func (r *Router) Close() error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.closeWebhooks()
 	return nil
 }
 

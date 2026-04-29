@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '**'
+      - "**"
 
 jobs:
   build:
@@ -103,7 +103,7 @@ jobs:
       CGO_ENABLED: 0
     steps:
       - name: Checkout codebase
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: main
 
@@ -122,7 +122,7 @@ jobs:
 
       - name: Get project dependencies
         run: go mod download
-      
+
       - name: Build Xray
         run: |
           mkdir -p build_assets
@@ -149,7 +149,7 @@ jobs:
           done
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Xray-${{ env.ASSET_NAME }}
           path: "Xray-${{ env.ASSET_NAME }}.zip*"
@@ -161,12 +161,13 @@ jobs:
       id-token: write
       contents: write
       attestations: write
+      artifact-metadata: write
 
     runs-on: ubuntu-latest
 
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           merge-multiple: true
 
@@ -181,21 +182,21 @@ jobs:
           done
 
       - name: Attest
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest@v4
         with:
           subject-path: "Xray-*.zip"
 
       - name: Create Release
-        uses: ncipollo/release-action@v1.14.0
+        uses: ncipollo/release-action@v1
         with:
           body: >
             [\[使用说明\]](https://github.com/vrnobody/xraye/wiki)
             [\[更新日志\]](https://github.com/vrnobody/xraye/blob/main/.github/update-log.md)
             [\[GitHub action\]](https://github.com/vrnobody/xraye/actions/runs/${{ github.run_id }})
 
-            
+
             发布文件不包含 `geoip.dat`, `geosite.dat`, `wintun.dll` 等资源文件。
-            
+
             如有需要请到 [Xray-core](https://github.com/XTLS/Xray-core) 项目下载。
           draft: false
           prerelease: false
