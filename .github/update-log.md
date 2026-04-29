@@ -18,7 +18,8 @@
 
 #### exp #34（2026-04-29）
 
-更新 xray-core 至 v26.4.25
+更新 xray-core 至 v26.4.25  
+删除 windows arm 7 发布文件  
 prober 子命令忽略内核 panic
 
 #### exp #33 (2026-02-07)
