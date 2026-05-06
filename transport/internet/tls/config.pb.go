@@ -201,10 +201,11 @@ type Config struct {
 	RejectUnknownSni bool   `protobuf:"varint,12,opt,name=reject_unknown_sni,json=rejectUnknownSni,proto3" json:"reject_unknown_sni,omitempty"`
 	MasterKeyLog     string `protobuf:"bytes,15,opt,name=master_key_log,json=masterKeyLog,proto3" json:"master_key_log,omitempty"`
 	// Lists of string as CurvePreferences values.
-	CurvePreferences     []string               `protobuf:"bytes,16,rep,name=curve_preferences,json=curvePreferences,proto3" json:"curve_preferences,omitempty"`
-	VerifyPeerCertByName []string               `protobuf:"bytes,17,rep,name=verify_peer_cert_by_name,json=verifyPeerCertByName,proto3" json:"verify_peer_cert_by_name,omitempty"`
-	EchServerKeys        []byte                 `protobuf:"bytes,18,opt,name=ech_server_keys,json=echServerKeys,proto3" json:"ech_server_keys,omitempty"`
-	EchConfigList        string                 `protobuf:"bytes,19,opt,name=ech_config_list,json=echConfigList,proto3" json:"ech_config_list,omitempty"`
+	CurvePreferences     []string `protobuf:"bytes,16,rep,name=curve_preferences,json=curvePreferences,proto3" json:"curve_preferences,omitempty"`
+	VerifyPeerCertByName []string `protobuf:"bytes,17,rep,name=verify_peer_cert_by_name,json=verifyPeerCertByName,proto3" json:"verify_peer_cert_by_name,omitempty"`
+	EchServerKeys        []byte   `protobuf:"bytes,18,opt,name=ech_server_keys,json=echServerKeys,proto3" json:"ech_server_keys,omitempty"`
+	EchConfigList        string   `protobuf:"bytes,19,opt,name=ech_config_list,json=echConfigList,proto3" json:"ech_config_list,omitempty"`
+	// Deprecated
 	EchForceQuery        string                 `protobuf:"bytes,20,opt,name=ech_force_query,json=echForceQuery,proto3" json:"ech_force_query,omitempty"`
 	EchSocketSettings    *internet.SocketConfig `protobuf:"bytes,21,opt,name=ech_socket_settings,json=echSocketSettings,proto3" json:"ech_socket_settings,omitempty"`
 	PinnedPeerCertSha256 [][]byte               `protobuf:"bytes,22,rep,name=pinned_peer_cert_sha256,json=pinnedPeerCertSha256,proto3" json:"pinned_peer_cert_sha256,omitempty"`

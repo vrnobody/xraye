@@ -1,16 +1,23 @@
-#### 命令
-
+#### merge upstream steps
 ```bash
+git fetch upstream
+git checkout -b <temp-branch>
+git merge upstream/main | tee debug/mlog.txt
 
-# 修改go.mod后执行：
-go mod tidy
+# fix merge conflicts and commit changes
 
 # 版本信息修改
 core/core.go
 
-# 查看差异文件名：
-git diff origin/main --name-only | grep -v -P "\.pb\.go$" | less
+# 更新全部protobuf:
+go run -v ./infra/vprotogen/main.go -pwd .
 
+# build and test
+# commit changes
+
+git checkout main
+git merge <temp-branch>
+git branch -d <temp-branch>
 ```
 
 #### protobuf
@@ -30,21 +37,19 @@ go run -v ./infra/vprotogen/main.go -pwd .
 go generate core/proto.go
 ```
 
-#### go 1.20支持的最高版本
+#### git thing
 
 ```bash
-github.com/quic-go/quic-go v0.40.1
-gvisor.dev/gvisor v0.0.0-20231104011432-48a6d7d5bd0b
+# 查看差异文件名：
+git diff origin/main --name-only | grep -v -P "\.pb\.go$" | less
 ```
 
-#### git merge
-
-update main branch
-
 ```bash
+# merge upstream
+
 git fetch upstream
 git checkout -b <temp-branch>
-git merge upstream/main
+git merge upstream/main | tee debug/mlog.txt
 
 # fix merge conflicts and commit changes
 
@@ -53,9 +58,9 @@ git merge <temp-branch>
 git branch -d <temp-branch>
 ```
 
-revert commits
-
 ```bash
+# revert commits
+
 git checkout <branch-for-revert>
 git merge main
 git revert <commit id>
@@ -64,4 +69,11 @@ git revert --continue
 git checkout api
 git merge <branch-for-revert>
 # fix conflicts
+```
+
+#### go 1.20支持的最高版本
+
+```bash
+github.com/quic-go/quic-go v0.40.1
+gvisor.dev/gvisor v0.0.0-20231104011432-48a6d7d5bd0b
 ```
