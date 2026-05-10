@@ -9,6 +9,8 @@ git merge upstream/main | tee debug/mlog.txt
 # 版本信息修改
 core/core.go
 
+go mod tidy
+
 # 更新全部protobuf:
 go run -v ./infra/vprotogen/main.go -pwd .
 
