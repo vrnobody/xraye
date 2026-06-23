@@ -20,12 +20,12 @@ import (
 var (
 	Version_x byte = 26
 	Version_y byte = 6
-	Version_z byte = 1
+	Version_z byte = 22
 )
 
 var (
 	build    = "Custom"
-	expWarn  = "Experimental #37"
+	expWarn  = "Experimental #38"
 	codename = "Xray, Penetrates Everything."
 	intro    = "A unified platform for anti-censorship."
 )
