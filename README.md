@@ -1,3 +1,7 @@
+#### 2026-11-23 这个项目和上游项目分叉越来越严重，难以维护，停止更新。  
+  
+  
+  
 [![Unit Tests][1]][2] [![Release][3]][4] [![Total Downloads][5]][6] [![License][7]][8]  
 
 [1]: https://github.com/vrnobody/xraye/actions/workflows/test.yml/badge.svg "Unit Tests Status Badge"
